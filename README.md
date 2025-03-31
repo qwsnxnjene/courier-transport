@@ -73,4 +73,6 @@ go run .
 - В `master` попадает только стабильная версия
 
 ## Участники проекта
-
+[Халимов Данил](https://github.com/qwsnxnjene)
+[Кабиров Ильдар](https://github.com/IldarKab)
+[Ширгалин Осман](https://github.com/shirgx)
