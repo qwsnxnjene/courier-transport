@@ -21,14 +21,14 @@ func FreeScootersHandler(w http.ResponseWriter, r *http.Request) {
 	var result []Scooter
 
 	if db2.Database == nil {
-		log.Print("[internal/app/handlers/handlers.go]: Database not initialized\n")
+		log.Print("[internal/app/handlers/transport-handlers.go]: Database not initialized\n")
 		return
 	}
 
 	query := `SELECT latitude, longitude, batteryLevel FROM e_scooters WHERE status LIKE 'free'`
 	rows, err := db2.Database.Query(query)
 	if err != nil {
-		log.Printf("[internal/app/handlers/handlers.go]: %v", err)
+		log.Printf("[internal/app/handlers/transport-handlers.go]: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -38,7 +38,7 @@ func FreeScootersHandler(w http.ResponseWriter, r *http.Request) {
 
 		err = rows.Scan(&scooter.Latitude, &scooter.Longitude, &scooter.BatteryLevel)
 		if err != nil {
-			log.Printf("[internal/app/handlers/handlers.go]: %v", err)
+			log.Printf("[internal/app/handlers/transport-handlers.go]: %v", err)
 			json.NewEncoder(w).Encode([]Scooter{})
 			return
 		}
