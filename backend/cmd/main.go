@@ -18,6 +18,7 @@ func main() {
 	}
 
 	r.HandleFunc("/api/transport", handlers.FreeScootersHandler)
+	r.HandleFunc("api/auth/login", handlers.SignInHandler)
 
 	err = http.ListenAndServe(":3031", r)
 	if err != nil {
