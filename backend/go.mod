@@ -3,6 +3,7 @@ module github.com/qwsnxnjene/courier-transport/backend
 go 1.23.8
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.1
 	modernc.org/sqlite v1.37.0
 )
