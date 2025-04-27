@@ -25,7 +25,7 @@ func FreeScootersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := `SELECT latitude, longitude, batteryLevel FROM e_scooters WHERE status LIKE 'free'`
+	query := `SELECT latitude, longitude, battery_level FROM e_scooters WHERE status LIKE 'free'`
 	rows, err := db2.Database.Query(query)
 	if err != nil {
 		log.Printf("[internal/app/handlers/transport-handlers.go]: %v", err)

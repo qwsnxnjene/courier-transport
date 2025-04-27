@@ -1,0 +1,13 @@
+{
+  "name": "courier-transport",
+  "version": "1.0.0",
+  "scripts": {
+    "prestart": "test -d node_modules || npm install; test -d frontend/node_modules || npm install --prefix frontend; cd backend && go mod tidy && cd ..",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend/cmd && go run main.go",
+    "start": "concurrently --kill-others --prefix \"[{name}]\" --names \"frontend,backend\" --prefix-colors \"green,blue\" \"npm run start:frontend\" \"npm run start:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0"
+  }
+}
