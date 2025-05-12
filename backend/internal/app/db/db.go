@@ -6,16 +6,22 @@ import (
 	"log"
 	_ "modernc.org/sqlite"
 	"os"
-	"path"
 	"path/filepath"
+	"runtime"
 )
 
 var dbPath string
 var Database *sql.DB
 
+func getDbDir() string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Dir(filename)
+}
+
 // CreateDatabase получает путь к файлу с базой данных и, если необходимо, создаёт таблицу
 func CreateDatabase() error {
-	dbPath = path.Join("..", "internal", "app", "db", "courier.db")
+	dbDir := getDbDir()
+	dbPath = filepath.Join(dbDir, "courier.db")
 
 	_, err := os.Stat(dbPath)
 	var install bool
@@ -38,12 +44,12 @@ func CreateDatabase() error {
 // возвращает nil при успешном создании таблицы, иначе ошибку
 func CreateTable(pathDb string) error {
 	db, err := sql.Open("sqlite", pathDb)
-
 	if err != nil {
 		return fmt.Errorf("[internal.app.db.CreateTable]: %w", err)
 	}
 
-	sqlPath := filepath.Join("..", "internal", "app", "db", "create.sql")
+	dbDir := getDbDir()
+	sqlPath := filepath.Join(dbDir, "create.sql")
 	createQuery, err := os.ReadFile(sqlPath)
 	if err != nil {
 		return fmt.Errorf("[internal.app.db.CreateTable]: %w", err)
@@ -72,7 +78,12 @@ func OpenSql() (*sql.DB, error) {
 		return nil, fmt.Errorf("[internal.app.db.OpenSql]: %w", err)
 	}
 
-	Database = db
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("[internal.app.db.OpenSql]: failed to ping database: %w", err)
+	}
 
+	Database = db
 	return db, nil
 }

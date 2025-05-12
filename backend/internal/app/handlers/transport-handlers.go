@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	db2 "github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
 	"log"
+	_ "modernc.org/sqlite"
 	"net/http"
 )
 
@@ -19,9 +20,10 @@ func FreeScootersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	var result []Scooter
-
+	
 	if db2.Database == nil {
 		log.Print("[internal/app/handlers/transport-handlers.go]: Database not initialized\n")
+		http.Error(w, "Внутренняя ошибка сервера: база данных не инициализирована", http.StatusInternalServerError)
 		return
 	}
 
