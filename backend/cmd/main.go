@@ -10,12 +10,16 @@ import (
 )
 
 func main() {
-	r := mux.NewRouter()
-
 	_, err := db2.OpenSql()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to open database: %v", err)
 	}
+
+	if db2.Database == nil {
+		log.Fatal("Database is nil after OpenSql")
+	}
+
+	r := mux.NewRouter()
 
 	r.HandleFunc("/api/transport", handlers.FreeScootersHandler)
 	r.HandleFunc("/api/auth/login", handlers.SignInHandler)
