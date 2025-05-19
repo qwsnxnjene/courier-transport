@@ -24,6 +24,7 @@ func main() {
 
 	r.HandleFunc("/api/transport", handlers.FreeScootersHandler)
 	r.HandleFunc("/api/auth/login", handlers.SignInHandler)
+	r.HandleFunc("/api/auth/signup", handlers.SignUpHandler)
 
 	allowedOrigins := ghandlers.AllowedOrigins([]string{"http://localhost:3000"})
 	allowedMethods := ghandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})

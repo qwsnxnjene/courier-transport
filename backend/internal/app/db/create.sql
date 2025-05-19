@@ -15,3 +15,9 @@ INSERT INTO transport (type, latitude, longitude, battery_level, status, price) 
     ('e-bike', '55.781234', '49.115789', 20, 'maintenance', 4),
     ('e-scooter', '55.790543', '49.130987', 95, 'free', 5),
     ('bike', '55.794321', '49.110456', 45, 'booked', 3);
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    login TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL
+)
