@@ -68,7 +68,8 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 		hash := sha256.Sum256(secret)
 
 		claims := jwt.MapClaims{
-			"hash": hex.EncodeToString(hash[:]),
+			"hash":  hex.EncodeToString(hash[:]),
+			"login": p.Login,
 		}
 
 		jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
