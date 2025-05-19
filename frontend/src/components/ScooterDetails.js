@@ -1,35 +1,34 @@
+// ScooterDetails.js
 import React from 'react';
 
-const ScooterDetails = ({ scooter, onClose, onBook }) => {
-    if (!scooter) return null;
+const ScooterDetails = ({ vehicle, onClose, onBook }) => {
+    if (!vehicle) return null;
 
     return (
-        <div
-            className="scooter-details-overlay"
-            style={{
-                position: 'fixed',
-                top: '0',
-                left: '0',
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 1000, // Устанавливаем поверх всех элементов
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}
+        <div className="scooter-details-overlay"
+             style={{
+                 position: 'fixed',
+                 top: '0',
+                 left: '0',
+                 width: '100%',
+                 height: '100%',
+                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                 zIndex: 1000,
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+             }}
         >
-            <div
-                className="scooter-details"
-                style={{
-                    background: 'white',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    maxWidth: '400px',
-                    width: '90%',
-                    textAlign: 'center',
-                    position: 'relative',
-                }}
+            <div className="scooter-details"
+                 style={{
+                     background: 'white',
+                     padding: '20px',
+                     borderRadius: '12px',
+                     maxWidth: '400px',
+                     width: '90%',
+                     textAlign: 'center',
+                     position: 'relative',
+                 }}
             >
                 <button
                     className="close-details"
@@ -47,20 +46,20 @@ const ScooterDetails = ({ scooter, onClose, onBook }) => {
                 >
                     ✖
                 </button>
-                <h2>Сведения о самокате</h2>
+                <h2>Информация о транспорте</h2>
                 <p>
-                    <strong>Широта:</strong> {scooter.latitude}
+                    <strong>Тип:</strong> {vehicle.type}
                 </p>
                 <p>
-                    <strong>Долгота:</strong> {scooter.longitude}
+                    <strong>Заряд батареи:</strong> {vehicle.batteryLevel}%
                 </p>
                 <p>
-                    <strong>Заряд батареи:</strong> {scooter.batteryLevel}%
+                    <strong>Статус:</strong> {vehicle.status === 'free' ? 'Свободен' : 'Недоступен'}
                 </p>
                 <p>
-                    <strong>Статус:</strong> {scooter.status === 'free' ? 'Свободен' : 'Недоступен'}
+                    <strong>Стоимость:</strong> {vehicle.pricePerMinute}₽/мин
                 </p>
-                {scooter.status === 'free' && (
+                {vehicle.status === 'free' && (
                     <button
                         className="book-scooter"
                         onClick={onBook}
