@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCreditCard, FaHistory, FaLifeRing, FaCog } from 'react-icons/fa';
 import Profile from './Profile';
+import Payment from './Payment';
 
 const Header = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [notifications, setNotifications] = useState('enabled');
     const [language, setLanguage] = useState('ru');
 
@@ -32,6 +34,11 @@ const Header = () => {
         setIsSidebarOpen(false);
     };
 
+    const handlePaymentClick = () => {
+        setIsPaymentOpen(true);
+        setIsSidebarOpen(false);
+    };
+
     const handleSettingsClick = () => {
         setIsSettingsOpen(true);
         setIsSidebarOpen(false);
@@ -49,6 +56,10 @@ const Header = () => {
         setIsProfileOpen(false);
     };
 
+    const closePayment = () => {
+        setIsPaymentOpen(false);
+    };
+
     const saveSettings = (e) => {
         e.preventDefault();
         localStorage.setItem('notifications', notifications);
@@ -59,7 +70,7 @@ const Header = () => {
 
     const menuItems = [
         { label: 'Профиль', icon: <FaUser />, onClick: handleProfileClick },
-        { label: 'Оплата', icon: <FaCreditCard /> },
+        { label: 'Оплата', icon: <FaCreditCard />, onClick: handlePaymentClick },
         { label: 'История', icon: <FaHistory /> },
         { label: 'Поддержка', icon: <FaLifeRing />, onClick: handleSupportClick },
         { label: 'Настройки', icon: <FaCog />, onClick: handleSettingsClick },
@@ -83,6 +94,9 @@ const Header = () => {
 
             {/* Профиль */}
             {isProfileOpen && <Profile onClose={closeProfile} />}
+
+            {/* Оплата */}
+            {isPaymentOpen && <Payment onClose={closePayment} />}
 
             {/* Модальное окно Поддержки */}
             {isSupportOpen && (
