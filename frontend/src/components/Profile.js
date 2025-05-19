@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt, FaMoneyBillWave, FaBiking } from 'react-icons/fa';
 import Login from './Login';
 
 const Profile = ({ onClose }) => {
@@ -9,15 +9,21 @@ const Profile = ({ onClose }) => {
     const mockProfileData = {
         name: 'Иван Петров',
         rating: 4.8,
-        totalRides: 256,
-        workingHours: 180,
-        earnedThisMonth: 58000,
         status: 'active',
         transportPreferences: ['Электросамокат', 'Велосипед'],
         currentVehicle: null,
         documents: {
             passport: 'Подтвержден',
             driverLicense: 'Не требуется',
+        },
+        rentalStats: {
+            totalRentals: 45,
+            currentBalance: 2500,
+            vehicleStats: {
+                'e-scooter': 25,    // электросамокаты
+                'bike': 12,         // велосипеды
+                'e-bike': 8         // электровелосипеды
+            }
         }
     };
 
@@ -60,24 +66,43 @@ const Profile = ({ onClose }) => {
 
                 <div className="profile-stats">
                     <div className="stat-item">
-                        <FaMotorcycle />
+                        <FaBiking />
                         <div className="stat-details">
-                            <span className="stat-value">{profileData.totalRides}</span>
-                            <span className="stat-label">Поездок</span>
+                            <span className="stat-value">{profileData.rentalStats.totalRentals}</span>
+                            <span className="stat-label">Аренд транспорта</span>
                         </div>
                     </div>
                     <div className="stat-item">
-                        <FaClock />
+                        <FaMoneyBillWave />
                         <div className="stat-details">
-                            <span className="stat-value">{profileData.workingHours}ч</span>
-                            <span className="stat-label">Отработано</span>
+                            <span className="stat-value">{profileData.rentalStats.currentBalance} ₽</span>
+                            <span className="stat-label">Баланс</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="earnings-section">
-                    <h3>Заработок за месяц</h3>
-                    <span className="earnings-amount">{profileData.earnedThisMonth} ₽</span>
+                <div className="rental-info-section">
+                    <h3>Информация об аренде</h3>
+                    <div className="rental-stats">
+                        <div className="rental-stat-item">
+                            <span>Электросамокаты:</span>
+                            <span>{profileData.rentalStats.vehicleStats['e-scooter']} поездок</span>
+                        </div>
+                        <div className="rental-stat-item">
+                            <span>Велосипеды:</span>
+                            <span>{profileData.rentalStats.vehicleStats['bike']} поездок</span>
+                        </div>
+                        <div className="rental-stat-item">
+                            <span>Электровелосипеды:</span>
+                            <span>{profileData.rentalStats.vehicleStats['e-bike']} поездок</span>
+                        </div>
+                        {profileData.currentVehicle && (
+                            <div className="rental-stat-item current-rental">
+                                <span>Текущая аренда:</span>
+                                <span>{profileData.currentVehicle}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="preferences-section">

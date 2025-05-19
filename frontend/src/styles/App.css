@@ -471,3 +471,35 @@ body, html {
   font-size: 0.9em;
   color: #666;
 }
+.rental-stats {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.rental-stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.rental-stat-item:last-child {
+    border-bottom: none;
+}
+
+.rental-stat-item.current-rental {
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 2px solid #e9ecef;
+}
+
+.rental-stat-item span:first-child {
+    color: #666;
+}
+
+.rental-stat-item span:last-child {
+    font-weight: 500;
+    color: #333;
+}
