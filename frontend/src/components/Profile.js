@@ -24,6 +24,7 @@ const Profile = ({ onClose }) => {
     useEffect(() => {
         // Проверяем наличие токена в localStorage
         const token = localStorage.getItem('authToken');
+        console.log(token)
         if (token) {
             setIsAuthorized(true);
             setProfileData(mockProfileData);

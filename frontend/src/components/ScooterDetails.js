@@ -4,6 +4,12 @@ import React from 'react';
 const ScooterDetails = ({ vehicle, onClose, onBook }) => {
     if (!vehicle) return null;
 
+    const typeTranslations = {
+        'e-scooter': 'Электросамокат',
+        'bike': 'Велосипед',
+        'e-bike': 'Электровелосипед'
+    };
+
     return (
         <div className="scooter-details-overlay"
              style={{
@@ -48,16 +54,13 @@ const ScooterDetails = ({ vehicle, onClose, onBook }) => {
                 </button>
                 <h2>Информация о транспорте</h2>
                 <p>
-                    <strong>Тип:</strong> {vehicle.type}
+                    <strong>Тип:</strong> {typeTranslations[vehicle.type] || vehicle.type}
                 </p>
                 <p>
                     <strong>Заряд батареи:</strong> {vehicle.batteryLevel}%
                 </p>
                 <p>
-                    <strong>Статус:</strong> {vehicle.status === 'free' ? 'Свободен' : 'Недоступен'}
-                </p>
-                <p>
-                    <strong>Стоимость:</strong> {vehicle.pricePerMinute}₽/мин
+                    <strong>Стоимость:</strong> {vehicle.price} ₽/мин
                 </p>
                 {vehicle.status === 'free' && (
                     <button

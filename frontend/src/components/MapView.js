@@ -10,9 +10,10 @@ const MapView = () => {
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
-                const response = await fetch('/api/transport');
+                const response = await fetch('http://localhost:3031/api/transport');
                 if (response.ok) {
                     const data = await response.json();
+                    console.log(data)
 
                     if (data.length === 0) {
                         console.warn('База данных пуста, используются тестовые данные.');

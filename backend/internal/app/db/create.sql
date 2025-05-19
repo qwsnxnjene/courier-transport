@@ -1,15 +1,23 @@
-CREATE TABLE e_scooters (
+CREATE TABLE transport (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT CHECK ( type IN ('e-scooter', 'bike', 'e-bike')),
     latitude TEXT, -- широта
     longitude TEXT, -- долгота
     battery_level INTEGER,
-    status TEXT CHECK ( status IN ('free', 'booked', 'in_ride', 'maintenance') )
+    status TEXT CHECK ( status IN ('free', 'booked', 'in_ride', 'maintenance') ),
+    price INTEGER
     -- user_id INTEGER REFERENCES users(id),
 );
 
-INSERT INTO e_scooters (latitude, longitude, battery_level, status) VALUES
-    ('55.7558', '37.6173', 85, 'free'),
-    ('55.7512', '37.6231', 60, 'in_ride'),
-    ('55.7489', '37.6105', 20, 'maintenance'),
-    ('55.7601', '37.6302', 95, 'free'),
-    ('55.7534', '37.6157', 45, 'booked');
+INSERT INTO transport (type, latitude, longitude, battery_level, status, price) VALUES
+    ('e-scooter', '55.796127', '49.106414', 85, 'free', 5),
+    ('bike', '55.788659', '49.122140', 60, 'in_ride', 3),
+    ('e-bike', '55.781234', '49.115789', 20, 'maintenance', 4),
+    ('e-scooter', '55.790543', '49.130987', 95, 'free', 5),
+    ('bike', '55.794321', '49.110456', 45, 'booked', 3);
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    login TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL
+)

@@ -2,13 +2,35 @@ package handlers
 
 import (
 	"crypto/sha256"
+	"database/sql"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
+	"golang.org/x/crypto/bcrypt"
+	"log"
+	_ "modernc.org/sqlite"
+
 	"net/http"
 	"os"
 )
+
+func authenticateUser(login, password string) (bool, error) {
+	var storedHash string
+	err := db.Database.QueryRow("SELECT password_hash FROM users WHERE login = ?", login).Scan(&storedHash)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil // Пользователь не найден
+	} else if err != nil {
+		return false, err // Ошибка базы данных
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(password))
+	if err != nil {
+		return false, nil // Пароль не совпадает
+	}
+	return true, nil
+}
 
 // SignInHandler обрабатывает POST-запросы по адресу /api/auth/login
 func SignInHandler(rw http.ResponseWriter, r *http.Request) {
@@ -19,6 +41,7 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 	rw.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	var p struct {
+		Login    string `json:"login"`
 		Password string `json:"password"`
 	}
 
@@ -30,8 +53,16 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	success, err := authenticateUser(p.Login, p.Password)
+	if err != nil {
+		log.Printf("Ошибка базы данных: %v", err)
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
+		return
+	}
+
 	var ans string
-	if p.Password == os.Getenv("COURIER_PASSWORD") {
+	if success {
 		secret := []byte(os.Getenv("COURIER_PASSWORD"))
 
 		hash := sha256.Sum256(secret)
@@ -53,7 +84,7 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 		fmt.Println(signedToken)
 	} else {
 		rw.WriteHeader(http.StatusBadRequest)
-		ans = `{"error":"Неверный пароль"}`
+		ans = `{"error":"Неверный пароль или логин"}`
 	}
 	rw.Write([]byte(ans))
 }
