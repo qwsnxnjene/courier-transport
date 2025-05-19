@@ -144,3 +144,177 @@ body, html {
     gap: 6px;
   }
 }
+
+/* Стили для профиля */
+.profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.profile-panel {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close-profile {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-avatar {
+  font-size: 50px;
+  margin-right: 15px;
+  color: #007bff;
+}
+
+.profile-main-info {
+  flex: 1;
+}
+
+.profile-main-info h2 {
+  margin: 0;
+  color: #333;
+}
+
+.rating {
+  color: #ffc107;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.stat-item {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.earnings-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.earnings-amount {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.preferences-section {
+  margin: 20px 0;
+}
+
+.preferences-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preference-tag {
+  background: #e9ecef;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9em;
+}
+
+.documents-section {
+  margin: 20px 0;
+}
+
+.document-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Стили для формы входа */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.login-button {
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
