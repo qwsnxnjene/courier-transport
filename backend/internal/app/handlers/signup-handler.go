@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
@@ -9,6 +10,18 @@ import (
 	_ "modernc.org/sqlite"
 	"net/http"
 )
+
+func createNewUser(login string) error {
+	query := `INSERT INTO profile_data(name, rating, status, transport_preferences, passport,
+                         driver_license, total_rentals, current_balance, e_scooters, bikes, e_bikes)
+				VALUES (:name, 0, 'active', '["Электросамокат", "Велосипед"]', 'Подтвержден', 'Не требуется',
+				        20, 2500, 10, 7, 3)`
+	_, err := db.Database.Exec(query, sql.Named("name", login))
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 // SignUpHandler обрабатывает регистрацию нового пользователя
 func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
@@ -68,6 +81,12 @@ func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
 			rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
 		}
 		return
+	}
+
+	err = createNewUser(p.Login)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+		rw.Write([]byte(`{"error": "Внутренняя ошибка сервера"}`))
 	}
 
 	rw.WriteHeader(http.StatusCreated)

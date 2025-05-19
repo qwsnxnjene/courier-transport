@@ -10,6 +10,8 @@ import (
 	"net/http"
 )
 
+//curl -X POST -H "Content-Type: application/json" -d '{"login":"user123","password":"password123"}' http://localhost:3031/api/auth/signup
+
 func main() {
 	_, err := db2.OpenSql()
 	if err != nil {
@@ -25,6 +27,7 @@ func main() {
 	r.HandleFunc("/api/transport", handlers.FreeScootersHandler)
 	r.HandleFunc("/api/auth/login", handlers.SignInHandler)
 	r.HandleFunc("/api/auth/signup", handlers.SignUpHandler)
+	r.HandleFunc("/api/profile", handlers.ProfileInfoHandler)
 
 	allowedOrigins := ghandlers.AllowedOrigins([]string{"http://localhost:3000"})
 	allowedMethods := ghandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})

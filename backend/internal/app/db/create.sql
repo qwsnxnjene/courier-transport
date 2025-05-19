@@ -20,4 +20,19 @@ CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     login TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL
+);
+
+CREATE TABLE profile_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    rating INTEGER,
+    status TEXT CHECK ( status IN ('active', 'retired') ),
+    transport_preferences TEXT,
+    passport TEXT CHECK ( passport IN ('Подтвержден', 'Не подтвержден', 'Не привязан') ),
+    driver_license TEXT,
+    total_rentals INTEGER,
+    current_balance INTEGER,
+    e_scooters INTEGER,
+    bikes INTEGER,
+    e_bikes INTEGER
 )
