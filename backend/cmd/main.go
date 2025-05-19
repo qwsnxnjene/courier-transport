@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	ghandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	db2 "github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
 	"github.com/qwsnxnjene/courier-transport/backend/internal/app/handlers"
@@ -24,7 +25,11 @@ func main() {
 	r.HandleFunc("/api/transport", handlers.FreeScootersHandler)
 	r.HandleFunc("/api/auth/login", handlers.SignInHandler)
 
-	err = http.ListenAndServe(":3031", r)
+	allowedOrigins := ghandlers.AllowedOrigins([]string{"http://localhost:3000"})
+	allowedMethods := ghandlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+	allowedHeaders := ghandlers.AllowedHeaders([]string{"Content-Type", "Authorization"})
+
+	err = http.ListenAndServe(":3031", ghandlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(r))
 	if err != nil {
 		log.Fatal(fmt.Errorf("main: %w", err).Error())
 	}
