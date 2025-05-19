@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt } from 'react-icons/fa';
+import Login from './Login';
 
 const Profile = ({ onClose }) => {
     const [isAuthorized, setIsAuthorized] = useState(false);
     const [profileData, setProfileData] = useState(null);
 
-    // Имитация данных профиля
     const mockProfileData = {
         name: 'Иван Петров',
         rating: 4.8,
@@ -22,19 +22,14 @@ const Profile = ({ onClose }) => {
     };
 
     useEffect(() => {
-        // Проверяем наличие токена в localStorage
         const token = localStorage.getItem('authToken');
-        console.log(token)
         if (token) {
             setIsAuthorized(true);
             setProfileData(mockProfileData);
         }
     }, []);
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        // Имитация успешной авторизации
-        localStorage.setItem('authToken', 'mock_token');
+    const handleLoginSuccess = () => {
         setIsAuthorized(true);
         setProfileData(mockProfileData);
     };
@@ -46,25 +41,7 @@ const Profile = ({ onClose }) => {
     };
 
     if (!isAuthorized) {
-        return (
-            <div className="profile-overlay">
-                <div className="profile-panel">
-                    <button className="close-profile" onClick={onClose}>×</button>
-                    <h2>Авторизация</h2>
-                    <form onSubmit={handleLogin} className="login-form">
-                        <div className="form-group">
-                            <label>Логин</label>
-                            <input type="text" placeholder="Введите логин" required />
-                        </div>
-                        <div className="form-group">
-                            <label>Пароль</label>
-                            <input type="password" placeholder="Введите пароль" required />
-                        </div>
-                        <button type="submit" className="login-button">Войти</button>
-                    </form>
-                </div>
-            </div>
-        );
+        return <Login onLoginSuccess={handleLoginSuccess} onClose={onClose} />;
     }
 
     return (
