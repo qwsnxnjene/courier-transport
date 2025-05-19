@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaCreditCard, FaHistory, FaLifeRing, FaCog } from 'react-icons/fa';
+import Profile from './Profile';
+import Payment from './Payment';
 
 const Header = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSupportOpen, setIsSupportOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-    // Состояние для настроек
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isPaymentOpen, setIsPaymentOpen] = useState(false);
     const [notifications, setNotifications] = useState('enabled');
     const [language, setLanguage] = useState('ru');
 
-    // Загрузка сохраненных настроек из localStorage при загрузке компонента
     useEffect(() => {
         const savedNotifications = localStorage.getItem('notifications');
         const savedLanguage = localStorage.getItem('language');
@@ -25,21 +26,40 @@ const Header = () => {
 
     const handleSupportClick = () => {
         setIsSupportOpen(true);
+        setIsSidebarOpen(false);
+    };
+
+    const handleProfileClick = () => {
+        setIsProfileOpen(true);
+        setIsSidebarOpen(false);
+    };
+
+    const handlePaymentClick = () => {
+        setIsPaymentOpen(true);
+        setIsSidebarOpen(false);
+    };
+
+    const handleSettingsClick = () => {
+        setIsSettingsOpen(true);
+        setIsSidebarOpen(false);
     };
 
     const closeSupport = () => {
         setIsSupportOpen(false);
     };
 
-    const handleSettingsClick = () => {
-        setIsSettingsOpen(true);
-    };
-
     const closeSettings = () => {
         setIsSettingsOpen(false);
     };
 
-    // Обработка сохранения настроек
+    const closeProfile = () => {
+        setIsProfileOpen(false);
+    };
+
+    const closePayment = () => {
+        setIsPaymentOpen(false);
+    };
+
     const saveSettings = (e) => {
         e.preventDefault();
         localStorage.setItem('notifications', notifications);
@@ -49,39 +69,47 @@ const Header = () => {
     };
 
     const menuItems = [
-        { label: 'Profile', icon: <FaUser /> },
-        { label: 'Payment', icon: <FaCreditCard /> },
-        { label: 'History', icon: <FaHistory /> },
-        { label: 'Support', icon: <FaLifeRing />, onClick: handleSupportClick },
-        { label: 'Settings', icon: <FaCog />, onClick: handleSettingsClick },
+        { label: 'Профиль', icon: <FaUser />, onClick: handleProfileClick },
+        { label: 'Оплата', icon: <FaCreditCard />, onClick: handlePaymentClick },
+        { label: 'История', icon: <FaHistory /> },
+        { label: 'Поддержка', icon: <FaLifeRing />, onClick: handleSupportClick },
+        { label: 'Настройки', icon: <FaCog />, onClick: handleSettingsClick },
     ];
 
     return (
         <div className="header">
             <button className="menu-button" onClick={toggleSidebar}>☰</button>
+
+            {/* Боковое меню */}
             <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <button className="close-button" onClick={toggleSidebar}>×</button>
                 <ul>
                     {menuItems.map((item, index) => (
-                        <li key={index} onClick={item.onClick || null}>
+                        <li key={index} onClick={item.onClick || null} style={{ cursor: 'pointer' }}>
                             {item.icon} <span>{item.label}</span>
                         </li>
                     ))}
                 </ul>
             </div>
 
+            {/* Профиль */}
+            {isProfileOpen && <Profile onClose={closeProfile} />}
+
+            {/* Оплата */}
+            {isPaymentOpen && <Payment onClose={closePayment} />}
+
             {/* Модальное окно Поддержки */}
             {isSupportOpen && (
                 <div className="support-overlay">
                     <div className="support-panel">
                         <button className="close-support" onClick={closeSupport}>×</button>
-                        <h2>Поддержка клиентов</h2>
+                        <h2>Поддержка курьеров</h2>
                         <p>Вы можете связаться с нами:</p>
                         <ul className="contact-info">
                             <li>Email: support@rentalsystem.com</li>
                             <li>Телефон: +7 (999) 123-45-67</li>
                         </ul>
-                        <h3>Жалоба</h3>
+                        <h3>Сообщить о проблеме</h3>
                         <form className="complaint-form">
                             <textarea
                                 placeholder="Опишите вашу проблему"

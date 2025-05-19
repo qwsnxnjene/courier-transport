@@ -1,13 +1,14 @@
+// MapView.js
 import React, { useEffect, useState } from 'react';
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 import ScooterDetails from './ScooterDetails';
 
 const MapView = () => {
-    const [scooters, setScooters] = useState([]);
-    const [selectedScooter, setSelectedScooter] = useState(null);
+    const [vehicles, setVehicles] = useState([]);
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
 
     useEffect(() => {
-        const fetchScooters = async () => {
+        const fetchVehicles = async () => {
             try {
                 const response = await fetch('/api/transport');
                 if (response.ok) {
@@ -15,37 +16,79 @@ const MapView = () => {
 
                     if (data.length === 0) {
                         console.warn('База данных пуста, используются тестовые данные.');
-                        setScooters([
-                            { latitude: '55.796127', longitude: '49.106414', batteryLevel: 80, status: 'free' },
-                            { latitude: '55.790000', longitude: '49.120000', batteryLevel: 40, status: 'free' },
-                            { latitude: '55.805000', longitude: '49.115000', batteryLevel: 95, status: 'free' },
+                        setVehicles([
+                            {
+                                latitude: '55.796127',
+                                longitude: '49.106414',
+                                batteryLevel: 80,
+                                status: 'free',
+                                type: 'Электросамокат',
+                                pricePerMinute: 5
+                            },
+                            {
+                                latitude: '55.790000',
+                                longitude: '49.120000',
+                                batteryLevel: 40,
+                                status: 'free',
+                                type: 'Велосипед',
+                                pricePerMinute: 3
+                            },
+                            {
+                                latitude: '55.805000',
+                                longitude: '49.115000',
+                                batteryLevel: 95,
+                                status: 'free',
+                                type: 'Электровелосипед',
+                                pricePerMinute: 4
+                            },
                         ]);
                     } else {
-                        setScooters(data);
+                        setVehicles(data);
                     }
                 } else {
                     console.error('Ошибка загрузки данных.');
                 }
             } catch (error) {
                 console.error('Ошибка сети:', error);
-                setScooters([
-                    { latitude: '55.796127', longitude: '49.106414', batteryLevel: 80, status: 'free' },
-                    { latitude: '55.790000', longitude: '49.120000', batteryLevel: 40, status: 'free' },
-                    { latitude: '55.805000', longitude: '49.115000', batteryLevel: 95, status: 'free' },
+                setVehicles([
+                    {
+                        latitude: '55.796127',
+                        longitude: '49.106414',
+                        batteryLevel: 80,
+                        status: 'free',
+                        type: 'Электросамокат',
+                        pricePerMinute: 5
+                    },
+                    {
+                        latitude: '55.790000',
+                        longitude: '49.120000',
+                        batteryLevel: 40,
+                        status: 'free',
+                        type: 'Велосипед',
+                        pricePerMinute: 3
+                    },
+                    {
+                        latitude: '55.805000',
+                        longitude: '49.115000',
+                        batteryLevel: 95,
+                        status: 'free',
+                        type: 'Электровелосипед',
+                        pricePerMinute: 4
+                    },
                 ]);
             }
         };
 
-        fetchScooters();
+        fetchVehicles();
     }, []);
 
-    const handlePlacemarkClick = (scooter) => setSelectedScooter(scooter);
+    const handlePlacemarkClick = (vehicle) => setSelectedVehicle(vehicle);
 
-    const handleCloseDetails = () => setSelectedScooter(null);
+    const handleCloseDetails = () => setSelectedVehicle(null);
 
-    const handleBookScooter = () => {
-        console.log(`Самокат с координатами [${selectedScooter.latitude}, ${selectedScooter.longitude}] забронирован!`);
-        setSelectedScooter(null);
+    const handleBookVehicle = () => {
+        console.log(`Транспорт типа ${selectedVehicle.type} забронирован!`);
+        setSelectedVehicle(null);
     };
 
     return (
@@ -56,21 +99,20 @@ const MapView = () => {
                     width="100%"
                     height="100%"
                 >
-                    {scooters.map((scooter, index) => (
+                    {vehicles.map((vehicle, index) => (
                         <Placemark
                             key={index}
-                            geometry={[parseFloat(scooter.latitude), parseFloat(scooter.longitude)]}
-                            onClick={() => handlePlacemarkClick(scooter)}
+                            geometry={[parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)]}
+                            onClick={() => handlePlacemarkClick(vehicle)}
                         />
                     ))}
                 </Map>
             </YMaps>
 
-            {/* Отображение деталей самоката поверх карты */}
             <ScooterDetails
-                scooter={selectedScooter}
+                vehicle={selectedVehicle}
                 onClose={handleCloseDetails}
-                onBook={handleBookScooter}
+                onBook={handleBookVehicle}
             />
         </div>
     );
