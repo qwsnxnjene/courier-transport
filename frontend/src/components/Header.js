@@ -115,7 +115,7 @@ const Header = () => {
                                 placeholder="Опишите вашу проблему"
                                 rows="5"
                                 style={{
-                                    width: '100%',
+                                    width: '95%',
                                     fontSize: '14px',
                                     padding: '8px',
                                     borderRadius: '6px',
