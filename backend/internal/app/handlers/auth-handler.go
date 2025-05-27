@@ -10,7 +10,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	_ "modernc.org/sqlite"
 
 	"net/http"
@@ -21,13 +20,13 @@ func authenticateUser(login, password string) (bool, error) {
 	var storedHash string
 	err := db.Database.QueryRow("SELECT password_hash FROM users WHERE login = ?", login).Scan(&storedHash)
 	if errors.Is(err, sql.ErrNoRows) {
-		return false, nil // Пользователь не найден
+		return false, errors.New("Пользователь не найден") // Пользователь не найден
 	} else if err != nil {
 		return false, err // Ошибка базы данных
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(password))
 	if err != nil {
-		return false, nil // Пароль не совпадает
+		return false, errors.New("Пароль неверный") // Пароль не совпадает
 	}
 	return true, nil
 }
@@ -55,8 +54,7 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 
 	success, err := authenticateUser(p.Login, p.Password)
 	if err != nil {
-		log.Printf("Ошибка базы данных: %v", err)
-		rw.WriteHeader(http.StatusInternalServerError)
+		rw.WriteHeader(http.StatusBadRequest)
 		rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
 		return
 	}
@@ -82,10 +80,10 @@ func SignInHandler(rw http.ResponseWriter, r *http.Request) {
 
 		ans = fmt.Sprintf(`{"token":"%v"}`, signedToken)
 		rw.WriteHeader(http.StatusOK)
-		fmt.Println(signedToken)
 	} else {
 		rw.WriteHeader(http.StatusBadRequest)
 		ans = `{"error":"Неверный пароль или логин"}`
 	}
+	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte(ans))
 }
