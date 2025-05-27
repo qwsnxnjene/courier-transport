@@ -72,11 +72,10 @@ func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
 	// Вставка пользователя в базу данных
 	_, err = db.Database.Exec("INSERT INTO users (login, password_hash) VALUES (?, ?)", p.Login, string(hashedPassword))
 	if err != nil {
-		if err.Error() == "UNIQUE constraint failed: users.login" {
+		if err.Error() == "UNIQUE constraint failed: users.login (2067)" {
 			rw.WriteHeader(http.StatusConflict)
 			rw.Write([]byte(`{"error":"Логин уже занят"}`))
 		} else {
-			log.Printf("Ошибка базы данных: %v", err)
 			rw.WriteHeader(http.StatusInternalServerError)
 			rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
 		}
