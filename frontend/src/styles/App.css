@@ -42,31 +42,30 @@ body, html {
 }
 
 .vehicle-card {
-  /* Вместо фиксированных 120px: */
   flex: 1 1 calc((100% - 16px) / 3 * 0.9);
-  /* без max-width, чтобы карточки ужимались */
   border-radius: 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   aspect-ratio: 1/1.2;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   background-color: #e3e3e3;
-  transform: scale(0.9);
-  transform-origin: top center;
+  overflow: hidden;
 }
 
 .vehicle-icon {
-  font-size: 32px;
+  flex-shrink: 0;
 }
 
 .price {
-  /* раньше font-size: 12px; */
   font-size: clamp(0.75rem, 2.5vw, 1rem);
   color: gray;
+}
+
+.vehicle-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ride-action {
@@ -86,11 +85,6 @@ body, html {
   font-size: clamp(1rem, 8vw, 2rem);
   border: none;
   border-radius: 20px;
-}
-.vehicle-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .sidebar {
@@ -502,4 +496,122 @@ body, html {
 .rental-stat-item span:last-child {
     font-weight: 500;
     color: #333;
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px;
+  }
+
+  .menu-button {
+    font-size: 1.8rem;
+  }
+
+  .vehicle-card {
+    flex: 1 1 calc(50% - 8px); /* Две карточки в ряд */
+  }
+
+  .profile-panel, .payment-panel {
+    width: 90%; /* Уменьшаем ширину */
+    height: auto; /* Высота подстраивается под содержимое */
+    max-height: 80%; /* Ограничиваем максимальную высоту */
+    border-radius: 10px; /* Добавляем скругление */
+    margin: 20px auto; /* Центрируем */
+    padding: 16px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    margin-bottom: 10px;
+  }
+
+  .profile-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stat-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .preferences-list {
+    justify-content: center;
+  }
+
+  .sidebar {
+    width: 85%;
+  }
+
+  .saved-card {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-info {
+    flex: 1 1 100%;
+  }
+
+  .remove-card-button {
+    margin-left: auto;
+  }
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 768px) {
+  .vehicle-card {
+    flex: 1 1 calc(33.33% - 8px); /* Три карточки в ряд */
+  }
+
+  .profile-panel, .payment-panel {
+    width: 80%; /* Уменьшаем ширину */
+    max-height: 85%; /* Ограничиваем максимальную высоту */
+    margin: 30px auto; /* Центрируем */
+  }
+
+  .sidebar {
+    width: 70%;
+  }
+
+  .payment-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Улучшение скроллинга для мобильных устройств */
+.sidebar ul,
+.profile-panel,
+.payment-panel,
+.vehicle-selector {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.vehicle-selector::-webkit-scrollbar {
+  display: none;
+}
+
+/* Сенсорные устройства */
+@media (hover: none) {
+  .sidebar li,
+  .payment-method,
+  .saved-card,
+  .add-card-button {
+    min-height: 44px; /* Увеличенные тач-таргеты */
+  }
+
+  .close-button,
+  .close-profile,
+  .close-payment {
+    padding: 12px;
+  }
 }

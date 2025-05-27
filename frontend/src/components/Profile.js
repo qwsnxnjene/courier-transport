@@ -52,9 +52,9 @@ const Profile = ({ onClose }) => {
 
     return (
         <div className="profile-overlay">
-            <div className="profile-panel">
+            <div className="profile-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
                 <button className="close-profile" onClick={onClose}>×</button>
-                <div className="profile-header">
+                <div className="profile-header" style={{ flexDirection: window.innerWidth <= 480 ? 'column' : 'row' }}>
                     <FaUser className="profile-avatar" />
                     <div className="profile-main-info">
                         <h2>{profileData.name}</h2>
@@ -64,7 +64,7 @@ const Profile = ({ onClose }) => {
                     </div>
                 </div>
 
-                <div className="profile-stats">
+                <div className="profile-stats" style={{ flexDirection: window.innerWidth <= 480 ? 'column' : 'row' }}>
                     <div className="stat-item">
                         <FaBiking />
                         <div className="stat-details">
