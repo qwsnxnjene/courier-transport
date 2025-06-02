@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaUser, FaCreditCard, FaHistory, FaLifeRing, FaCog } from 'react-icons/fa';
 import Profile from './Profile';
 import Payment from './Payment';
+import RideHistory from './RideHistory';
 
 const Header = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -9,6 +10,7 @@ const Header = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false); // New state for history modal
     const [notifications, setNotifications] = useState('enabled');
     const [language, setLanguage] = useState('ru');
 
@@ -39,6 +41,11 @@ const Header = () => {
         setIsSidebarOpen(false);
     };
 
+    const handleHistoryClick = () => { // New handler for history click
+        setIsHistoryOpen(true);
+        setIsSidebarOpen(false);
+    };
+
     const handleSettingsClick = () => {
         setIsSettingsOpen(true);
         setIsSidebarOpen(false);
@@ -60,6 +67,10 @@ const Header = () => {
         setIsPaymentOpen(false);
     };
 
+    const closeHistory = () => { // New close handler for history
+        setIsHistoryOpen(false);
+    };
+
     const saveSettings = (e) => {
         e.preventDefault();
         localStorage.setItem('notifications', notifications);
@@ -71,7 +82,7 @@ const Header = () => {
     const menuItems = [
         { label: 'Профиль', icon: <FaUser />, onClick: handleProfileClick },
         { label: 'Оплата', icon: <FaCreditCard />, onClick: handlePaymentClick },
-        { label: 'История', icon: <FaHistory /> },
+        { label: 'История', icon: <FaHistory />, onClick: handleHistoryClick }, // Added onClick handler
         { label: 'Поддержка', icon: <FaLifeRing />, onClick: handleSupportClick },
         { label: 'Настройки', icon: <FaCog />, onClick: handleSettingsClick },
     ];
@@ -97,48 +108,56 @@ const Header = () => {
 
             {/* Оплата */}
             {isPaymentOpen && <Payment onClose={closePayment} />}
+            
+            {/* История поездок */}
+            {isHistoryOpen && <RideHistory onClose={closeHistory} />}
 
             {/* Модальное окно Поддержки */}
             {isSupportOpen && (
                 <div className="support-overlay">
-                    <div className="support-panel">
-                        <button className="close-support" onClick={closeSupport}>×</button>
-                        <h2>Поддержка курьеров</h2>
-                        <p>Вы можете связаться с нами:</p>
-                        <ul className="contact-info">
-                            <li>Email: support@rentalsystem.com</li>
-                            <li>Телефон: +7 (999) 123-45-67</li>
-                        </ul>
-                        <h3>Сообщить о проблеме</h3>
-                        <form className="complaint-form">
-                            <textarea
-                                placeholder="Опишите вашу проблему"
-                                rows="5"
-                                style={{
-                                    width: '95%',
-                                    fontSize: '14px',
-                                    padding: '8px',
-                                    borderRadius: '6px',
-                                    border: '1px solid #ccc',
-                                    resize: 'none',
-                                }}
-                            ></textarea>
-                            <button
-                                type="submit"
-                                style={{
-                                    marginTop: '10px',
-                                    padding: '8px 16px',
-                                    backgroundColor: '#007BFF',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '16px',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                Отправить
-                            </button>
-                        </form>
+                    <div className="support-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
+                        <div className="modal-header">
+                            <h2>Поддержка курьеров</h2>
+                            <button className="modal-close-button" onClick={closeSupport}>×</button>
+                        </div>
+                        
+                        <div className="modal-content">
+                            <p>Вы можете связаться с нами:</p>
+                            <ul className="contact-info">
+                                <li>Email: support@rentalsystem.com</li>
+                                <li>Телефон: +7 (999) 123-45-67</li>
+                            </ul>
+                            <h3>Сообщить о проблеме</h3>
+                            <form className="complaint-form">
+                                <textarea
+                                    placeholder="Опишите вашу проблему"
+                                    rows="5"
+                                    style={{
+                                        width: '95%',
+                                        fontSize: '14px',
+                                        padding: '8px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #ccc',
+                                        resize: 'none',
+                                    }}
+                                ></textarea>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        marginTop: '10px',
+                                        padding: '8px 16px',
+                                        backgroundColor: '#007BFF',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Отправить
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
@@ -146,48 +165,53 @@ const Header = () => {
             {/* Модальное окно Настроек */}
             {isSettingsOpen && (
                 <div className="settings-overlay">
-                    <div className="settings-panel">
-                        <button className="close-settings" onClick={closeSettings}>×</button>
-                        <h2>Настройки</h2>
-                        <form className="settings-form" onSubmit={saveSettings}>
-                            <div className="form-group">
-                                <label htmlFor="notifications">Уведомления</label>
-                                <select
-                                    id="notifications"
-                                    value={notifications}
-                                    onChange={(e) => setNotifications(e.target.value)}
+                    <div className="settings-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
+                        <div className="modal-header">
+                            <h2>Настройки</h2>
+                            <button className="modal-close-button" onClick={closeSettings}>×</button>
+                        </div>
+                        
+                        <div className="modal-content">
+                            <form className="settings-form" onSubmit={saveSettings}>
+                                <div className="form-group">
+                                    <label htmlFor="notifications">Уведомления</label>
+                                    <select
+                                        id="notifications"
+                                        value={notifications}
+                                        onChange={(e) => setNotifications(e.target.value)}
+                                    >
+                                        <option value="enabled">Включены</option>
+                                        <option value="disabled">Выключены</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="language">Язык</label>
+                                    <select
+                                        id="language"
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value)}
+                                    >
+                                        <option value="ru">Русский</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                                <button
+                                    type="submit"
+                                    style={{
+                                        marginTop: '10px',
+                                        padding: '8px 16px',
+                                        backgroundColor: '#28a745',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        fontSize: '16px',
+                                        cursor: 'pointer',
+                                    }}
                                 >
-                                    <option value="enabled">Включены</option>
-                                    <option value="disabled">Выключены</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="language">Язык</label>
-                                <select
-                                    id="language"
-                                    value={language}
-                                    onChange={(e) => setLanguage(e.target.value)}
-                                >
-                                    <option value="ru">Русский</option>
-                                    <option value="en">English</option>
-                                </select>
-                            </div>
-                            <button
-                                type="submit"
-                                style={{
-                                    marginTop: '10px',
-                                    padding: '8px 16px',
-                                    backgroundColor: '#28a745',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    fontSize: '16px',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                Сохранить настройки
-                            </button>
-                        </form>
+                                    Сохранить настройки
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
