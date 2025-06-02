@@ -15,7 +15,7 @@ func createNewUser(login string) error {
 	query := `INSERT INTO profile_data(name, rating, status, transport_preferences, passport,
                          driver_license, total_rentals, current_balance, e_scooters, bikes, e_bikes)
 				VALUES (:name, 0, 'active', '["Электросамокат", "Велосипед"]', 'Подтвержден', 'Не требуется',
-				        20, 2500, 10, 7, 3)`
+				        0, 0, 0, 0, 0)`
 	_, err := db.Database.Exec(query, sql.Named("name", login))
 	if err != nil {
 		return err
