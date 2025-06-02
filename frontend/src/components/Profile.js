@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt, FaMoneyBillWave, FaBiking } from 'react-icons/fa';
+import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt } from 'react-icons/fa';
 import Login from './Login';
 
 const Profile = ({ onClose }) => {
@@ -54,7 +54,7 @@ const Profile = ({ onClose }) => {
         <div className="profile-overlay">
             <div className="profile-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
                 <button className="close-profile" onClick={onClose}>×</button>
-                <div className="profile-header" style={{ flexDirection: window.innerWidth <= 480 ? 'column' : 'row' }}>
+                <div className="profile-header">
                     <FaUser className="profile-avatar" />
                     <div className="profile-main-info">
                         <h2>{profileData.name}</h2>
@@ -64,16 +64,14 @@ const Profile = ({ onClose }) => {
                     </div>
                 </div>
 
-                <div className="profile-stats" style={{ flexDirection: window.innerWidth <= 480 ? 'column' : 'row' }}>
+                <div className="profile-stats">
                     <div className="stat-item">
-                        <FaBiking />
                         <div className="stat-details">
                             <span className="stat-value">{profileData.rentalStats.totalRentals}</span>
                             <span className="stat-label">Аренд транспорта</span>
                         </div>
                     </div>
                     <div className="stat-item">
-                        <FaMoneyBillWave />
                         <div className="stat-details">
                             <span className="stat-value">{profileData.rentalStats.currentBalance} ₽</span>
                             <span className="stat-label">Баланс</span>
