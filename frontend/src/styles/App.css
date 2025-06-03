@@ -197,6 +197,7 @@ body, html {
   margin: 0;
   margin-bottom: 5px;
   color: #333;
+  font-size: 1.2em;
 }
 
 .rating {
@@ -226,16 +227,19 @@ body, html {
 .stat-details {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .stat-value {
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
+  color: #333;
 }
 
 .stat-label {
   color: #666;
   font-size: 0.9em;
+  margin-top: 2px;
 }
 
 .earnings-section {
@@ -259,13 +263,15 @@ body, html {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 
 .preference-tag {
   background: #e9ecef;
-  padding: 5px 10px;
+  padding: 5px 12px;
   border-radius: 15px;
   font-size: 0.9em;
+  color: #333;
 }
 
 .documents-section {
@@ -275,7 +281,17 @@ body, html {
 .document-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin: 10px 0;
+  font-size: 0.95em;
+}
+
+.document-name {
+  color: #666;
+}
+
+.document-status {
+  color: #333;
 }
 
 .logout-button {
@@ -483,8 +499,10 @@ body, html {
 .rental-stat-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #eee;
+    font-size: 0.95em;
 }
 
 .rental-stat-item:last-child {
@@ -504,6 +522,14 @@ body, html {
 .rental-stat-item span:last-child {
     font-weight: 500;
     color: #333;
+}
+
+.rental-info-section h3,
+.preferences-section h3,
+.documents-section h3 {
+  margin: 20px 0 10px 0;
+  font-size: 1.1em;
+  color: #333;
 }
 
 /* Адаптивность для маленьких экранов */
