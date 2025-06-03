@@ -73,7 +73,7 @@ const Profile = ({ onClose }) => {
                         <div className="stat-item">
                             <div className="stat-details">
                                 <span className="stat-value">{profileData.rentalStats.totalRentals}</span>
-                                <span className="stat-label">Количество аренд</span>
+                                <span className="stat-label">Аренды</span>
                             </div>
                         </div>
                         <div className="stat-item">
