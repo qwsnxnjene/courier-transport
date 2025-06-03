@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaStar, FaMotorcycle, FaClock, FaSignOutAlt } from 'react-icons/fa';
+import { FaUser, FaStar, FaSignOutAlt } from 'react-icons/fa';
 import Login from './Login';
 
 const Profile = ({ onClose }) => {
@@ -53,82 +53,88 @@ const Profile = ({ onClose }) => {
     return (
         <div className="profile-overlay">
             <div className="profile-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
-                <button className="close-profile" onClick={onClose}>×</button>
-                <div className="profile-header">
-                    <FaUser className="profile-avatar" />
-                    <div className="profile-main-info">
-                        <h2>{profileData.name}</h2>
-                        <div className="rating">
-                            <FaStar /> {profileData.rating}
-                        </div>
-                    </div>
+                <div className="modal-header">
+                    <h2>Профиль</h2>
+                    <button className="modal-close-button" onClick={onClose}>×</button>
                 </div>
-
-                <div className="profile-stats">
-                    <div className="stat-item">
-                        <div className="stat-details">
-                            <span className="stat-value">{profileData.rentalStats.totalRentals}</span>
-                            <span className="stat-label">Количество аренд</span>
-                        </div>
-                    </div>
-                    <div className="stat-item">
-                        <div className="stat-details">
-                            <span className="stat-value">{profileData.rentalStats.currentBalance} ₽</span>
-                            <span className="stat-label">Баланс</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="rental-info-section">
-                    <h3>Информация об аренде</h3>
-                    <div className="rental-stats">
-                        <div className="rental-stat-item">
-                            <span>Электросамокаты:</span>
-                            <span>{profileData.rentalStats.vehicleStats['e-scooter']} поездок</span>
-                        </div>
-                        <div className="rental-stat-item">
-                            <span>Велосипеды:</span>
-                            <span>{profileData.rentalStats.vehicleStats['bike']} поездок</span>
-                        </div>
-                        <div className="rental-stat-item">
-                            <span>Электровелосипеды:</span>
-                            <span>{profileData.rentalStats.vehicleStats['e-bike']} поездок</span>
-                        </div>
-                        {profileData.currentVehicle && (
-                            <div className="rental-stat-item current-rental">
-                                <span>Текущая аренда:</span>
-                                <span>{profileData.currentVehicle}</span>
+                
+                <div className="modal-content">
+                    <div className="profile-header">
+                        <FaUser className="profile-avatar" />
+                        <div className="profile-main-info">
+                            <h2>{profileData.name}</h2>
+                            <div className="rating">
+                                <FaStar /> {profileData.rating}
                             </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className="preferences-section">
-                    <h3>Предпочитаемый транспорт</h3>
-                    <div className="preferences-list">
-                        {profileData.transportPreferences.map((transport, index) => (
-                            <span key={index} className="preference-tag">{transport}</span>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="documents-section">
-                    <h3>Документы</h3>
-                    <div className="documents-list">
-                        <div className="document-item">
-                            <span className="document-name">Паспорт:</span>
-                            <span className="document-status">{profileData.documents.passport}</span>
-                        </div>
-                        <div className="document-item">
-                            <span className="document-name">Водительские права:</span>
-                            <span className="document-status">{profileData.documents.driverLicense}</span>
                         </div>
                     </div>
-                </div>
 
-                <button className="logout-button" onClick={handleLogout}>
-                    <FaSignOutAlt /> Выйти
-                </button>
+                    <div className="profile-stats">
+                        <div className="stat-item">
+                            <div className="stat-details">
+                                <span className="stat-value">{profileData.rentalStats.totalRentals}</span>
+                                <span className="stat-label">Количество аренд</span>
+                            </div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-details">
+                                <span className="stat-value">{profileData.rentalStats.currentBalance} ₽</span>
+                                <span className="stat-label">Баланс</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rental-info-section">
+                        <h3>Информация об аренде</h3>
+                        <div className="rental-stats">
+                            <div className="rental-stat-item">
+                                <span>Электросамокаты:</span>
+                                <span>{profileData.rentalStats.vehicleStats['e-scooter']} поездок</span>
+                            </div>
+                            <div className="rental-stat-item">
+                                <span>Велосипеды:</span>
+                                <span>{profileData.rentalStats.vehicleStats['bike']} поездок</span>
+                            </div>
+                            <div className="rental-stat-item">
+                                <span>Электровелосипеды:</span>
+                                <span>{profileData.rentalStats.vehicleStats['e-bike']} поездок</span>
+                            </div>
+                            {profileData.currentVehicle && (
+                                <div className="rental-stat-item current-rental">
+                                    <span>Текущая аренда:</span>
+                                    <span>{profileData.currentVehicle}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="preferences-section">
+                        <h3>Предпочитаемый транспорт</h3>
+                        <div className="preferences-list">
+                            {profileData.transportPreferences.map((transport, index) => (
+                                <span key={index} className="preference-tag">{transport}</span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="documents-section">
+                        <h3>Документы</h3>
+                        <div className="documents-list">
+                            <div className="document-item">
+                                <span className="document-name">Паспорт:</span>
+                                <span className="document-status">{profileData.documents.passport}</span>
+                            </div>
+                            <div className="document-item">
+                                <span className="document-name">Водительские права:</span>
+                                <span className="document-status">{profileData.documents.driverLicense}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button className="logout-button" onClick={handleLogout}>
+                        <FaSignOutAlt /> Выйти
+                    </button>
+                </div>
             </div>
         </div>
     );
