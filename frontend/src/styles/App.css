@@ -550,10 +550,12 @@ body, html {
 }
 
 .rental-info-section h3,
+.preferences-section h3,
 .documents-section h3 {
   margin: 20px 0 10px 0;
   font-size: 1.1em;
   color: #333;
+}
 
 /* Стили для истории поездок */
 .history-overlay {
