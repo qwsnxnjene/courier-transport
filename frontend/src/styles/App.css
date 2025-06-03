@@ -139,6 +139,38 @@ body, html {
   }
 }
 
+/* Общие стили для модальных окон с липким заголовком */
+.modal-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+  z-index: 10;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.modal-content {
+  padding-top: 5px;
+  overflow-y: auto;
+}
+
 /* Стили для профиля */
 .profile-overlay {
   position: fixed;
@@ -178,24 +210,20 @@ body, html {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-  gap: 15px;
 }
 
 .profile-avatar {
   font-size: 50px;
+  margin-right: 15px;
   color: #007bff;
-  margin-right: 0;
 }
 
 .profile-main-info {
   flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .profile-main-info h2 {
   margin: 0;
-  margin-bottom: 5px;
   color: #333;
   font-size: 1.2em;
 }
@@ -209,11 +237,8 @@ body, html {
 
 .profile-stats {
   display: flex;
-  justify-content: center; /* Изменено с space-between на center */
+  justify-content: space-around;
   margin: 20px 0;
-  flex-direction: row !important;
-  width: 100%; /* Добавляем ширину 100% */
-  gap: 30px; /* Добавляем расстояние между блоками */
 }
 
 .stat-item {
@@ -221,7 +246,6 @@ body, html {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: initial; /* Убираем flex: 1, чтобы элементы не растягивались */
 }
 
 .stat-details {
@@ -489,6 +513,7 @@ body, html {
   font-size: 0.9em;
   color: #666;
 }
+
 .rental-stats {
     background-color: #f8f9fa;
     border-radius: 8px;
@@ -525,11 +550,132 @@ body, html {
 }
 
 .rental-info-section h3,
-.preferences-section h3,
 .documents-section h3 {
   margin: 20px 0 10px 0;
   font-size: 1.1em;
   color: #333;
+
+/* Стили для истории поездок */
+.history-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.history-panel {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close-history {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.history-loading {
+  text-align: center;
+  padding: 30px 0;
+  color: #666;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 30px 0;
+  color: #666;
+}
+
+.ride-record {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.ride-date {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.ride-vehicle-type {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.vehicle-type-icon {
+  margin-right: 8px;
+  color: #007bff;
+}
+
+.ride-route-info {
+  font-size: 0.9em;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Стили для поддержки и настроек с липким заголовком */
+.support-overlay, .settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.support-panel, .settings-panel {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close-support, .close-settings {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Адаптивность для истории поездок на мобильных устройствах */
+@media (max-width: 480px) {
+  .history-panel {
+    width: 90%; /* Соответствует .profile-panel и .payment-panel */
+    max-height: 80%; /* Соответствует profile-panel и payment-panel */
+    padding: 16px;
+    border-radius: 10px;
+    margin: 20px auto; /* Центрируем, как и другие панели */
+  }
 }
 
 /* Адаптивность для маленьких экранов */
@@ -558,25 +704,23 @@ body, html {
   }
 
   .profile-header {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    text-align: left;
+    text-align: center;
   }
 
   .profile-avatar {
-    margin-bottom: 0;
-    margin-right: 15px;
+    margin-bottom: 10px;
   }
 
   .profile-stats {
-    flex-direction: row !important; /* Принудительно в одну строку даже на малых экранах */
-    justify-content: center; /* Центрируем блоки */
-    gap: 20px; /* Уменьшаем расстояние между блоками на маленьком экране */
+    flex-direction: column;
+    gap: 10px;
   }
 
   .stat-item {
-    width: auto;
-    justify-content: center; /* Центрируем содержимое блоков */
+    width: 100%;
+    justify-content: space-between;
   }
 
   .preferences-list {
@@ -599,6 +743,14 @@ body, html {
   .remove-card-button {
     margin-left: auto;
   }
+
+  .modal-header {
+    padding: 10px 0;
+  }
+
+  .modal-header h2 {
+    font-size: 1.3rem;
+  }
 }
 
 /* Адаптивность для планшетов */
@@ -620,6 +772,12 @@ body, html {
   .payment-tabs {
     flex-direction: column;
     gap: 8px;
+  }
+
+  .history-panel {
+    width: 80%; /* Соответствует .profile-panel и .payment-panel для планшетов */
+    max-height: 85%;
+    margin: 30px auto;
   }
 }
 

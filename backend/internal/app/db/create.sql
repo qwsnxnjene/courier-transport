@@ -35,4 +35,14 @@ CREATE TABLE profile_data (
     e_scooters INTEGER,
     bikes INTEGER,
     e_bikes INTEGER
-)
+);
+
+CREATE TABLE rides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    transport_id INTEGER,
+    start TEXT,
+    end TEXT,
+    transport_type TEXT CHECK (transport_type IN ('e-scooter', 'bike', 'e-bike')),
+    total INTEGER
+);
