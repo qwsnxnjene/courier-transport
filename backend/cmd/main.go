@@ -28,6 +28,7 @@ func main() {
 	r.HandleFunc("/api/auth/login", handlers.SignInHandler)
 	r.HandleFunc("/api/auth/signup", handlers.SignUpHandler)
 	r.HandleFunc("/api/profile", handlers.ProfileInfoHandler)
+	r.HandleFunc("/api/addride", handlers.AddRideHandler)
 	r.HandleFunc("/api/rides", handlers.RideInfoHandler).Methods("GET")
 
 	allowedOrigins := ghandlers.AllowedOrigins([]string{"http://localhost:3000"})
