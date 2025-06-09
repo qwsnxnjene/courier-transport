@@ -65,7 +65,7 @@ func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Ошибка хэширования пароля: %v", err)
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
+		rw.Write([]byte(`{"error":"Ошибка хэширования пароля"}`))
 		return
 	}
 
@@ -77,7 +77,7 @@ func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
 			rw.Write([]byte(`{"error":"Логин уже занят"}`))
 		} else {
 			rw.WriteHeader(http.StatusInternalServerError)
-			rw.Write([]byte(`{"error":"Внутренняя ошибка сервера"}`))
+			rw.Write([]byte(fmt.Sprintf(`{"error":"Внутренняя ошибка сервера %v"}`, err)))
 		}
 		return
 	}
@@ -85,7 +85,7 @@ func SignUpHandler(rw http.ResponseWriter, r *http.Request) {
 	err = createNewUser(p.Login)
 	if err != nil {
 		rw.WriteHeader(http.StatusInternalServerError)
-		rw.Write([]byte(`{"error": "Внутренняя ошибка сервера"}`))
+		rw.Write([]byte(`{"error": "Ошибка создания профиля"}`))
 	}
 
 	rw.WriteHeader(http.StatusCreated)
