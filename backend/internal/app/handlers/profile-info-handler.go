@@ -1,17 +1,15 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt"
 	"github.com/qwsnxnjene/courier-transport/backend/internal/app/db"
-	"log"
 	"net/http"
 	"os"
 	"strings"
+	"github.com/golang-jwt/jwt/v5" // проверь номер версии у себя!
 )
+
 
 // GetLoginFromToken проверяет корректность и валидность JWT-токена, и извлекает из него логин пользователя
 func GetLoginFromToken(r *http.Request, secret string) (string, error) {
@@ -54,65 +52,53 @@ func GetLoginFromToken(r *http.Request, secret string) (string, error) {
 	return "", fmt.Errorf("токен недействителен")
 }
 
+
 func ProfileInfoHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	// Получение логина из токена
-	login, err := GetLoginFromToken(r, os.Getenv("COURIER_PASSWORD"))
+	secret := os.Getenv("JWT_SECRET_KEY")
+	login, err := GetLoginFromToken(r, secret)
 	if err != nil {
-		http.Error(w, fmt.Sprintf(`{"error":"%v"}`, err), http.StatusUnauthorized)
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(fmt.Sprintf(`{"error":"%v"}`, err)))
 		return
 	}
 
-	// Запрос данных пользователя из базы (пример)
-	var userData struct {
-		Login       string   `json:"name"`
-		Rating      int      `json:"rating"`
-		Status      string   `json:"status"`
-		Preferences []string `json:"transportPreferences"`
-		Documents   struct {
-			Passport      string `json:"passport"`
-			DriverLicense string `json:"driverLicense"`
-		} `json:"documents"`
-		RentalStats struct {
-			TotalRentals   int `json:"totalRentals"`
-			CurrentBalance int `json:"currentBalance"`
-			VehicleStats   struct {
-				E_scooter int `json:"e-scooter"`
-				Bike      int `json:"bike"`
-				E_bike    int `json:"e-bike"`
-			} `json:"vehicleStats"`
-		}
+	var profile struct {
+		Name            string  `json:"Name"`
+		Rating          float64 `json:"Rating"`
+		Status          string  `json:"Status"`
+		Transport       string  `json:"Transport"`
+		Passport        string  `json:"Passport"`
+		DriverLicense   string  `json:"DriverLicense"`
+		TotalRentals    int     `json:"TotalRentals"`
+		CurrentBalance  float64 `json:"CurrentBalance"`
+		EScooters       int     `json:"EScooters"`
+		Bikes           int     `json:"Bikes"`
+		EBikes          int     `json:"EBikes"`
 	}
 
-	var prefJSON string
-	err = db.Database.QueryRow(`SELECT name, rating, status, transport_preferences, passport, driver_license,
-       					total_rentals, current_balance, e_scooters, bikes, e_bikes
-						FROM profile_data WHERE name = :login`, sql.Named("login", login)).
-		Scan(&userData.Login, &userData.Rating, &userData.Status, &prefJSON,
-			&userData.Documents.Passport, &userData.Documents.DriverLicense,
-			&userData.RentalStats.TotalRentals, &userData.RentalStats.CurrentBalance,
-			&userData.RentalStats.VehicleStats.E_scooter, &userData.RentalStats.VehicleStats.Bike,
-			&userData.RentalStats.VehicleStats.E_bike)
-	if errors.Is(err, sql.ErrNoRows) {
-		http.Error(w, `{"error":"Пользователь не найден"}`, http.StatusNotFound)
-		return
-	} else if err != nil {
-		log.Printf("Ошибка базы данных: %v", err)
-		http.Error(w, `{"error":"Внутренняя ошибка сервера"}`, http.StatusInternalServerError)
+	err = db.Database.QueryRow(`
+		SELECT name, rating, status, transport_preferences, passport, driver_license,
+		       total_rentals, current_balance, e_scooters, bikes, e_bikes
+		FROM profile_data WHERE name = ?
+	`, login).Scan(
+		&profile.Name,
+		&profile.Rating,
+		&profile.Status,
+		&profile.Transport,
+		&profile.Passport,
+		&profile.DriverLicense,
+		&profile.TotalRentals,
+		&profile.CurrentBalance,
+		&profile.EScooters,
+		&profile.Bikes,
+		&profile.EBikes,
+	)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"error":"Профиль не найден"}`))
 		return
 	}
 
-	if prefJSON != "" {
-		err = json.Unmarshal([]byte(prefJSON), &userData.Preferences)
-		if err != nil {
-			log.Printf("Ошибка десериализации предпочтений: %v", err)
-			http.Error(w, `{"error":"Внутренняя ошибка сервера"}`, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Отправка ответа
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(userData)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(profile)
 }
