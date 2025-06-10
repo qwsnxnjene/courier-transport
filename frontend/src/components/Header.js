@@ -10,66 +10,31 @@ const Header = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isPaymentOpen, setIsPaymentOpen] = useState(false);
-    const [isHistoryOpen, setIsHistoryOpen] = useState(false); // New state for history modal
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [notifications, setNotifications] = useState('enabled');
     const [language, setLanguage] = useState('ru');
+    const [userLogin, setUserLogin] = useState(null);
 
     useEffect(() => {
+        const login = localStorage.getItem('login');
+        setUserLogin(login);
         const savedNotifications = localStorage.getItem('notifications');
         const savedLanguage = localStorage.getItem('language');
-
         if (savedNotifications) setNotifications(savedNotifications);
         if (savedLanguage) setLanguage(savedLanguage);
     }, []);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    const handleSupportClick = () => {
-        setIsSupportOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const handleProfileClick = () => {
-        setIsProfileOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const handlePaymentClick = () => {
-        setIsPaymentOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const handleHistoryClick = () => { // New handler for history click
-        setIsHistoryOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const handleSettingsClick = () => {
-        setIsSettingsOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const closeSupport = () => {
-        setIsSupportOpen(false);
-    };
-
-    const closeSettings = () => {
-        setIsSettingsOpen(false);
-    };
-
-    const closeProfile = () => {
-        setIsProfileOpen(false);
-    };
-
-    const closePayment = () => {
-        setIsPaymentOpen(false);
-    };
-
-    const closeHistory = () => { // New close handler for history
-        setIsHistoryOpen(false);
-    };
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+    const handleSupportClick = () => { setIsSupportOpen(true); setIsSidebarOpen(false); };
+    const handleProfileClick = () => { setIsProfileOpen(true); setIsSidebarOpen(false); };
+    const handlePaymentClick = () => { setIsPaymentOpen(true); setIsSidebarOpen(false); };
+    const handleHistoryClick = () => { setIsHistoryOpen(true); setIsSidebarOpen(false); };
+    const handleSettingsClick = () => { setIsSettingsOpen(true); setIsSidebarOpen(false); };
+    const closeSupport = () => setIsSupportOpen(false);
+    const closeSettings = () => setIsSettingsOpen(false);
+    const closeProfile = () => setIsProfileOpen(false);
+    const closePayment = () => setIsPaymentOpen(false);
+    const closeHistory = () => setIsHistoryOpen(false);
 
     const saveSettings = (e) => {
         e.preventDefault();
@@ -82,7 +47,7 @@ const Header = () => {
     const menuItems = [
         { label: 'Профиль', icon: <FaUser />, onClick: handleProfileClick },
         { label: 'Оплата', icon: <FaCreditCard />, onClick: handlePaymentClick },
-        { label: 'История', icon: <FaHistory />, onClick: handleHistoryClick }, // Added onClick handler
+        { label: 'История', icon: <FaHistory />, onClick: handleHistoryClick },
         { label: 'Поддержка', icon: <FaLifeRing />, onClick: handleSupportClick },
         { label: 'Настройки', icon: <FaCog />, onClick: handleSettingsClick },
     ];
@@ -95,8 +60,8 @@ const Header = () => {
             <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <button className="close-button" onClick={toggleSidebar}>×</button>
                 <ul>
-                    {menuItems.map((item, index) => (
-                        <li key={index} onClick={item.onClick || null} style={{ cursor: 'pointer' }}>
+                    {menuItems.map((item, i) => (
+                        <li key={i} onClick={item.onClick} style={{ cursor: 'pointer' }}>
                             {item.icon} <span>{item.label}</span>
                         </li>
                     ))}
@@ -105,14 +70,12 @@ const Header = () => {
 
             {/* Профиль */}
             {isProfileOpen && <Profile onClose={closeProfile} />}
-
             {/* Оплата */}
             {isPaymentOpen && <Payment onClose={closePayment} />}
-            
             {/* История поездок */}
             {isHistoryOpen && <RideHistory onClose={closeHistory} />}
 
-            {/* Модальное окно Поддержки */}
+            {/* Поддержка */}
             {isSupportOpen && (
                 <div className="support-overlay">
                     <div className="support-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
@@ -120,7 +83,6 @@ const Header = () => {
                             <h2>Поддержка курьеров</h2>
                             <button className="modal-close-button" onClick={closeSupport}>×</button>
                         </div>
-                        
                         <div className="modal-content">
                             <p>Вы можете связаться с нами:</p>
                             <ul className="contact-info">
@@ -128,7 +90,7 @@ const Header = () => {
                                 <li>Телефон: +7 (999) 123-45-67</li>
                             </ul>
                             <h3>Сообщить о проблеме</h3>
-                            <form className="complaint-form">
+                            <form className="complaint-form" onSubmit={e => {e.preventDefault(); alert('Ваша жалоба отправлена!'); closeSupport();}}>
                                 <textarea
                                     placeholder="Опишите вашу проблему"
                                     rows="5"
@@ -162,7 +124,7 @@ const Header = () => {
                 </div>
             )}
 
-            {/* Модальное окно Настроек */}
+            {/* Настройки */}
             {isSettingsOpen && (
                 <div className="settings-overlay">
                     <div className="settings-panel" style={{ maxWidth: window.innerWidth <= 480 ? '90%' : '500px' }}>
@@ -170,7 +132,6 @@ const Header = () => {
                             <h2>Настройки</h2>
                             <button className="modal-close-button" onClick={closeSettings}>×</button>
                         </div>
-                        
                         <div className="modal-content">
                             <form className="settings-form" onSubmit={saveSettings}>
                                 <div className="form-group">

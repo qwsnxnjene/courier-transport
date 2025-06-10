@@ -38,6 +38,7 @@ const Login = ({ onLoginSuccess, onClose }) => {
 
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
+                localStorage.setItem('login', loginData.login); // Сохраняем логин
                 onLoginSuccess();
             } else {
                 throw new Error('Токен не получен');
