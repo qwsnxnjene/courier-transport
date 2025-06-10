@@ -3,6 +3,7 @@ import { FaUser, FaCreditCard, FaHistory, FaLifeRing, FaCog } from 'react-icons/
 import Profile from './Profile';
 import Payment from './Payment';
 import RideHistory from './RideHistory';
+import CustomSelect from './CustomSelect'; // Import the new component
 
 const Header = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -78,6 +79,16 @@ const Header = () => {
         alert('Настройки успешно сохранены!');
         closeSettings();
     };
+
+    const notificationOptions = [
+        { value: 'enabled', label: 'Включены' },
+        { value: 'disabled', label: 'Выключены' },
+    ];
+
+    const languageOptions = [
+        { value: 'ru', label: 'Русский' },
+        { value: 'en', label: 'English' },
+    ];
 
     const menuItems = [
         { label: 'Профиль', icon: <FaUser />, onClick: handleProfileClick },
@@ -175,25 +186,21 @@ const Header = () => {
                             <form className="settings-form" onSubmit={saveSettings}>
                                 <div className="form-group">
                                     <label htmlFor="notifications">Уведомления</label>
-                                    <select
-                                        id="notifications"
-                                        value={notifications}
-                                        onChange={(e) => setNotifications(e.target.value)}
-                                    >
-                                        <option value="enabled">Включены</option>
-                                        <option value="disabled">Выключены</option>
-                                    </select>
+                                    <CustomSelect
+                                        options={notificationOptions}
+                                        selectedValue={notifications}
+                                        onChange={setNotifications}
+                                        placeholder="Выберите уведомления"
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="language">Язык</label>
-                                    <select
-                                        id="language"
-                                        value={language}
-                                        onChange={(e) => setLanguage(e.target.value)}
-                                    >
-                                        <option value="ru">Русский</option>
-                                        <option value="en">English</option>
-                                    </select>
+                                    <CustomSelect
+                                        options={languageOptions}
+                                        selectedValue={language}
+                                        onChange={setLanguage}
+                                        placeholder="Выберите язык"
+                                    />
                                 </div>
                                 <button
                                     type="submit"
