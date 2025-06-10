@@ -698,7 +698,7 @@ body, html {
     width: 90%; /* Соответствует .profile-panel и .payment-panel */
     max-height: 80%; /* Соответствует profile-panel и payment-panel */
     padding: 16px;
-    border-radius: 10px;
+    border-radius: 10px; /* Добавляем скругление */
     margin: 20px auto; /* Центрируем, как и другие панели */
   }
 }
@@ -835,4 +835,72 @@ body, html {
   .close-payment {
     padding: 12px;
   }
+}
+
+/* Custom Select Styles */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+}
+
+.custom-select-value {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: #333;
+}
+
+.custom-select-value svg {
+  color: #888;
+}
+
+.custom-select-options {
+  position: absolute;
+  top: 100%; /* Position below the select value */
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  z-index: 1050;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-height: 0; /* Start with 0 height */
+  opacity: 0; /* Start fully transparent */
+  overflow: hidden; /* Hide content when max-height is 0 */
+  pointer-events: none; /* Disable interaction when hidden */
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out; /* Animation */
+}
+
+.custom-select-options.open {
+  max-height: 200px; /* Target height when open */
+  opacity: 1; /* Fully visible when open */
+  overflow-y: auto; /* Allow scrolling if content exceeds max-height */
+  pointer-events: auto; /* Enable interaction when open */
+}
+
+.custom-select-option {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #333;
+}
+
+.custom-select-option:hover {
+  background-color: #f0f0f0;
+}
+
+.custom-select-option.selected {
+  background-color: #007bff;
+  color: white;
 }
