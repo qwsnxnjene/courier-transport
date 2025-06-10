@@ -6,9 +6,7 @@ const Payment = ({ onClose }) => {
     const [savedCards, setSavedCards] = useState([]);
     const [paymentHistory, setPaymentHistory] = useState([]);
 
-    // Имитация загрузки данных
     useEffect(() => {
-        // Имитация сохраненных карт
         setSavedCards([
             {
                 id: 1,
@@ -19,33 +17,14 @@ const Payment = ({ onClose }) => {
             }
         ]);
 
-        // Имитация истории платежей
-        setPaymentHistory([
-            {
-                id: 1,
-                date: '2024-03-20 15:30',
-                amount: 150,
-                duration: 30,
-                method: 'Visa *1234',
-                vehicleType: 'Электросамокат'
-            },
-            {
-                id: 2,
-                date: '2024-03-19 12:45',
-                amount: 90,
-                duration: 30,
-                method: 'PayPal',
-                vehicleType: 'Велосипед'
-            },
-            {
-                id: 3,
-                date: '2024-03-18 09:15',
-                amount: 180,
-                duration: 45,
-                method: 'Visa *1234',
-                vehicleType: 'Электровелосипед'
-            }
-        ]);
+        let loadedHistory = [];
+        const stored = localStorage.getItem("paymentHistory");
+        if (stored) {
+            loadedHistory = JSON.parse(stored);
+        } // не подставляем моковые данные!
+        setPaymentHistory(loadedHistory);
+
+
     }, []);
 
     const handleAddCard = () => {
@@ -132,11 +111,11 @@ const Payment = ({ onClose }) => {
                             <div key={payment.id} className="payment-record">
                                 <div className="payment-record-header">
                                     <span className="payment-date">{formatDate(payment.date)}</span>
-                                    <span className="payment-amount">{payment.amount} ₽</span>
+                                    <span className="payment-amount">{payment.amount}</span>
                                 </div>
                                 <div className="payment-details">
                                     <span>Транспорт: {payment.vehicleType}</span>
-                                    <span>Длительность: {payment.duration} мин</span>
+                                    <span>Длительность: {payment.duration}</span>
                                     <span>Способ оплаты: {payment.method}</span>
                                 </div>
                             </div>
