@@ -16,6 +16,16 @@ INSERT INTO transport (type, latitude, longitude, battery_level, status, price) 
     ('e-scooter', '55.790543', '49.130987', 95, 'free', 5),
     ('bike', '55.794321', '49.110456', 45, 'booked', 3);
 
+-- Убедитесь, что база данных открыта в режиме чтения-записи и не перемещена;
+-- Если база перемещена, закройте соединение, переместите файл обратно, и используйте правильный путь при подключении.
+
+INSERT INTO transport (type, latitude, longitude, battery_level, status, price) VALUES
+('e-scooter', '55.801111', '49.104001', 76, 'free', 5),
+('e-bike',    '55.799250', '49.128512', 55, 'free', 4),
+('bike',      '55.792101', '49.118900', 88, 'free', 3),
+('e-scooter', '55.794950', '49.120300', 42, 'free', 5),
+('e-bike',    '55.798890', '49.113057', 67, 'free', 4);
+
 CREATE TABLE users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     login TEXT UNIQUE NOT NULL,

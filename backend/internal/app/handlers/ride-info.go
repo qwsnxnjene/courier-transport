@@ -33,7 +33,7 @@ func RideInfoHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	q = `SELECT (start, end, transport_type, total) FROM rides WHERE user_id=:id`
+	   q = `SELECT start, end, transport_type, total FROM rides WHERE user_id=:id`
 	rows, err := db.Database.Query(q, sql.Named("id", id))
 	if err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
