@@ -2,6 +2,8 @@ import React from 'react';
 import bikeIcon from '../assets/images/Bike.png';
 import eBikeIcon from '../assets/images/E-Bike.png';
 import scooterIcon from '../assets/images/E-Scooter.png';
+import { useVehicle } from '../context/VehicleContext';
+import '../styles/App.css';
 
 const vehicles = [
     { type: 'Bike', price: 'от 3₽/мин', icon: bikeIcon },
@@ -10,10 +12,24 @@ const vehicles = [
 ];
 
 const VehicleSelector = () => {
+    const { selectedVehicleType, setSelectedVehicleType } = useVehicle();
+    const handleVehicleSelect = (type) => {
+        // Если уже выбран этот тип, сбрасываем выбор (показываем все)
+        if (selectedVehicleType === type) {
+            setSelectedVehicleType(null);
+        } else {
+            setSelectedVehicleType(type);
+        }
+    };
+
     return (
         <div className="vehicle-selector">
             {vehicles.map((vehicle, index) => (
-                <div key={index} className="vehicle-card">
+                <div 
+                    key={index} 
+                    className={`vehicle-card ${selectedVehicleType === vehicle.type ? 'selected' : ''}`}
+                    onClick={() => handleVehicleSelect(vehicle.type)}
+                >
                     <div
                         className="vehicle-icon"
                         style={{

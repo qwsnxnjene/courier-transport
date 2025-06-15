@@ -53,6 +53,12 @@ body, html {
   overflow: hidden;
 }
 
+.vehicle-card.selected {
+  background-color: #e6f7ff;
+  outline: 2px solid #1890ff;
+  outline-offset: -2px;
+}
+
 .vehicle-icon {
   flex-shrink: 0;
 }

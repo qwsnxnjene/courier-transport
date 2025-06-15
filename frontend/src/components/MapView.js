@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 import ScooterDetails from './ScooterDetails';
+import { useVehicle } from '../context/VehicleContext';
 
 const MapView = () => {
     const [vehicles, setVehicles] = useState([]);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const { selectedVehicleType } = useVehicle();
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -92,6 +94,41 @@ const MapView = () => {
         setSelectedVehicle(null);
     };
 
+    // Функция для преобразования русских названий типов в английские
+    const mapVehicleTypeToEnglish = (russianType) => {
+        // Handle cases where russianType might not be a string
+        if (typeof russianType !== 'string') {
+            return ""; 
+        }
+        const typeMap = {
+            'Электросамокат': 'E-Scooter',
+            'Велосипед': 'Bike',
+            'Электровелосипед': 'E-Bike'
+        };
+        return typeMap[russianType] || russianType; // Fallback returns original if not in map
+    };
+    
+    // Функция для сравнения типа транспорта с выбранным типом
+    const matchesSelectedType = (vehicleType) => {
+        const processedVehicleType = mapVehicleTypeToEnglish(vehicleType);
+
+        // Ensure both processedVehicleType and selectedVehicleType are strings before comparison
+        if (typeof processedVehicleType === 'string' && typeof selectedVehicleType === 'string') {
+            console.log(`Сравниваем (case-insensitive): '${processedVehicleType.toLowerCase()}' с '${selectedVehicleType.toLowerCase()}'`);
+            return processedVehicleType.toLowerCase() === selectedVehicleType.toLowerCase();
+        }
+        // console.log(`Сравнение не удалось: processed='${processedVehicleType}', selected='${selectedVehicleType}'`);
+        return false;
+    };
+
+    // Фильтруем транспорт по выбранному типу
+    const filteredVehicles = selectedVehicleType 
+        ? vehicles.filter(vehicle => vehicle && typeof vehicle.type === 'string' && matchesSelectedType(vehicle.type))
+        : vehicles;
+        
+    console.log("Выбранный тип:", selectedVehicleType);
+    console.log("Отфильтрованные транспорты:", filteredVehicles);
+
     return (
         <div className="map-container" style={{ width: '100%', height: '500px', position: 'relative' }}>
             <YMaps>
@@ -100,7 +137,7 @@ const MapView = () => {
                     width="100%"
                     height="100%"
                 >
-                    {vehicles.map((vehicle, index) => (
+                    {filteredVehicles.map((vehicle, index) => (
                         <Placemark
                             key={index}
                             geometry={[parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)]}
@@ -120,3 +157,4 @@ const MapView = () => {
 };
 
 export default MapView;
+
