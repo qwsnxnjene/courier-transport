@@ -5,10 +5,12 @@ import { useVehicle } from '../context/VehicleContext';
 
 const MapView = () => {
     const [vehicles, setVehicles] = useState([]);
-    const [selectedVehicle, setSelectedVehicle] = useState(null);
+    const [selectedVehicle, setSelectedVehicle] = useState(null); // For ScooterDetails modal
+    const [activeVehicle, setActiveVehicle] = useState(null); // For active (red) placemark on map
     const { selectedVehicleType } = useVehicle();
     const mapRef = useRef(null); // Ссылка на DOM-элемент карты
     const ymapRef = useRef(null); // Ссылка на инстанс карты ymaps
+    const routeRef = useRef(null); // Ссылка на текущий маршрут
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -97,68 +99,146 @@ const MapView = () => {
         : vehicles;
 
     useEffect(() => {
+        // Reset active and selected vehicle when the type filter changes
+        setActiveVehicle(null);
+        setSelectedVehicle(null);
+    }, [selectedVehicleType]);
+
+    useEffect(() => {
         if (window.ymaps && mapRef.current) {
-            window.ymaps.ready(() => {
+            const ymaps = window.ymaps; // Alias for convenience
+            ymaps.ready(() => {
                 if (!ymapRef.current) { 
-                    ymapRef.current = new window.ymaps.Map(mapRef.current, {
+                    ymapRef.current = new ymaps.Map(mapRef.current, {
                         center: [55.792139, 49.122135], 
                         zoom: 15, // Начальный зум
                     });
                 }
+                const mapInstance = ymapRef.current;
 
-                // Удаляем старые метки
-                ymapRef.current.geoObjects.removeAll();
+                // Удаляем старые метки и маршрут с карты
+                mapInstance.geoObjects.removeAll();
+                // Сбрасываем ссылку на старый маршрут, т.к. он удален с карты
+                if (routeRef.current) {
+                    routeRef.current = null; 
+                }
+
+                const userLocation = [55.792139, 49.122135]; // Координаты пользователя
 
                 // Добавляем метку пользователя
-                const userPlacemark = new window.ymaps.Placemark(
-                    [55.792139, 49.122135], // Координаты пользователя
+                const userPlacemark = new ymaps.Placemark(
+                    userLocation,
                     {
                         hintContent: 'Вы здесь',
                         balloonContent: 'Ваше текущее местоположение'
                     },
                     {
-                        preset: 'islands#geolocationIcon', // Стандартная иконка геолокации
-                        iconColor: '#007bff' // Цвет иконки (можно изменить)
+                        preset: 'islands#geolocationIcon',
+                        iconColor: '#007bff'
                     }
                 );
-                ymapRef.current.geoObjects.add(userPlacemark);
+                mapInstance.geoObjects.add(userPlacemark);
 
                 // Добавляем новые метки транспорта
                 filteredVehicles.forEach((vehicle) => {
-                    const placemark = new window.ymaps.Placemark(
+                    // Determine placemark preset based on whether it's the activeVehicle
+                    let placemarkPreset = 'islands#blueCircleDotIcon'; // Default preset
+                    if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
+                        placemarkPreset = 'islands#redCircleDotIcon'; // Active preset
+                    }
+
+                    const placemark = new ymaps.Placemark(
                         [parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)],
                         {
                             hintContent: vehicle.type,
                             balloonContent: `Тип: ${vehicle.type}<br>Батарея: ${vehicle.batteryLevel}%<br>Цена: ${vehicle.pricePerMinute}₽/мин`,
                         },
                         {
-                            // Опции.
-                            // Необходимо указать данный тип макета.
-                            iconLayout: 'default#image',
-                            // Своё изображение иконки метки.
-                            // iconImageHref: 'images/myIcon.gif', // Можно добавить свои иконки
-                            // Размеры метки.
-                            // iconImageSize: [30, 42],
-                            // Смещение левого верхнего угла иконки относительно
-                            // её "ножки" (точки привязки).
-                            // iconImageOffset: [-5, -38]
+                            preset: placemarkPreset,
                         }
                     );
+
                     placemark.events.add('click', () => {
-                        setSelectedVehicle(vehicle);
+                        if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
+                            // Second click on the same active placemark: show details
+                            setSelectedVehicle(vehicle);
+                        } else {
+                            // First click, or click on a different placemark: set as active, hide details
+                            setActiveVehicle(vehicle);
+                            setSelectedVehicle(null);
+                        }
                     });
-                    ymapRef.current.geoObjects.add(placemark);
+                    mapInstance.geoObjects.add(placemark);
                 });
+
+                // Логика построения маршрута
+                let routeDestination = null;
+                let buildRoute = false;
+
+                if (activeVehicle) {
+                    const isActiveVehicleInFilteredList = filteredVehicles.some(
+                        v => v.latitude === activeVehicle.latitude && v.longitude === activeVehicle.longitude
+                    );
+
+                    if (isActiveVehicleInFilteredList) {
+                        if (selectedVehicleType) { 
+                            const activeVehicleTypeEnglish = mapVehicleTypeToEnglish(activeVehicle.type);
+                            if (activeVehicleTypeEnglish && activeVehicleTypeEnglish.toLowerCase() === selectedVehicleType.toLowerCase()) {
+                                routeDestination = [parseFloat(activeVehicle.latitude), parseFloat(activeVehicle.longitude)];
+                                buildRoute = true;
+                            }
+                        } else { 
+                            routeDestination = [parseFloat(activeVehicle.latitude), parseFloat(activeVehicle.longitude)];
+                            buildRoute = true;
+                        }
+                    }
+                }
+
+                // Приоритет 2: Если конкретное ТС не выбрано (или т��п не совпадает), маршрут к ближайшему ТС выбранного типа
+                if (!buildRoute && selectedVehicleType && filteredVehicles.length > 0) {
+                    let nearestVehicle = null;
+                    let minDistanceSq = Infinity;
+
+                    filteredVehicles.forEach(vehicle => {
+                        const vehicleLat = parseFloat(vehicle.latitude);
+                        const vehicleLon = parseFloat(vehicle.longitude);
+                        const distSq = Math.pow(vehicleLat - userLocation[0], 2) + Math.pow(vehicleLon - userLocation[1], 2);
+                        if (distSq < minDistanceSq) {
+                            minDistanceSq = distSq;
+                            nearestVehicle = vehicle;
+                        }
+                    });
+
+                    if (nearestVehicle) {
+                        routeDestination = [parseFloat(nearestVehicle.latitude), parseFloat(nearestVehicle.longitude)];
+                        buildRoute = true;
+                    }
+                }
+
+                if (buildRoute && routeDestination) {
+                    const multiRoute = new ymaps.multiRouter.MultiRoute({
+                        referencePoints: [userLocation, routeDestination],
+                        params: {
+                            routingMode: 'pedestrian'
+                        }
+                    }, {
+                        boundsAutoApply: true,
+                        // Скрываем стандартные иконки начальной и конечной точек маршрута
+                        wayPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>'),
+                        viaPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>') // Для промежуточных точек, если будут
+                    });
+
+                    mapInstance.geoObjects.add(multiRoute);
+                    routeRef.current = multiRoute;
+                }
             });
         }
         // Очистка при размонтировании компонента
         return () => {
-            if (ymapRef.current) {
-                // ymapRef.current.destroy(); // Уничтожаем карту при размонтировании
-                // ymapRef.current = null;
-            }
+            // Логика очистки, если необходима при полном удалении компонента MapView
+            // Например, if (ymapRef.current && ymapRef.current.destroy) ymapRef.current.destroy();
         };
-    }, [filteredVehicles]); // Перерисовываем метки при изменении filteredVehicles
+    }, [vehicles, selectedVehicleType, activeVehicle, ymapRef, mapRef]); // Добавляем activeVehicle в зависимости
 
     const handleCloseDetails = () => setSelectedVehicle(null);
 
@@ -177,7 +257,6 @@ const MapView = () => {
             />
         </div>
     );
-};
-
+    }
 export default MapView;
 
