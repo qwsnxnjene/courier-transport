@@ -12,6 +12,9 @@ const MapView = () => {
     const ymapRef = useRef(null); // Ссылка на инстанс карты ymaps
     const routeRef = useRef(null); // Ссылка на текущий маршрут
 
+    const [mapApiReady, setMapApiReady] = useState(false);
+    const [mapInstanceReady, setMapInstanceReady] = useState(false);
+
     useEffect(() => {
         const fetchVehicles = async () => {
             try {
@@ -107,81 +110,79 @@ const MapView = () => {
     }, [selectedVehicleType]);
 
     useEffect(() => {
+        // Effect for Yandex Maps API loading
+        if (window.ymaps) {
+            console.log('[MapView DEBUG] YMAPS API script detected. Waiting for ready...');
+            window.ymaps.ready(() => {
+                console.log('[MapView DEBUG] YMAPS API is ready (from API ready effect).');
+                setMapApiReady(true);
+            });
+        } else {
+            console.log('[MapView DEBUG] YMAPS API script not detected yet.');
+            // Optionally, handle script loading here if not handled by index.html
+        }
+    }, []); // Runs once on mount
+
+    useEffect(() => {
         console.log('[MapView DEBUG] MAIN MAP EFFECT triggered. Dependencies:', {
+            mapApiReady,
+            mapInstanceReady,
             vehiclesCount: vehicles.length,
             selectedVehicleType,
             activeVehicleLat: activeVehicle?.latitude,
             filteredVehiclesCount: filteredVehicles.length
         });
 
-        if (window.ymaps && mapRef.current) {
+        if (mapApiReady && mapRef.current) {
             const ymaps = window.ymaps;
-            console.log('[MapView DEBUG] YMAPS API found.');
-            ymaps.ready(() => {
-                console.log('[MapView DEBUG] YMAPS ready callback entered.');
-                if (!ymapRef.current) { 
-                    console.log('[MapView DEBUG] Initializing map instance.');
-                    ymapRef.current = new ymaps.Map(mapRef.current, {
-                        center: [55.792139, 49.122135], 
-                        zoom: 15, // Начальный зум
-                    });
-                }
-                const mapInstance = ymapRef.current;
-                console.log('[MapView DEBUG] Map instance available.');
+            // Initialize map instance if API is ready and instance doesn't exist
+            if (!ymapRef.current) {
+                console.log('[MapView DEBUG] Initializing map instance (ymapRef.current is null).');
+                ymapRef.current = new ymaps.Map(mapRef.current, {
+                    center: [55.792139, 49.122135],
+                    zoom: 15,
+                });
+                setMapInstanceReady(true); // Signal that map instance is created
+                console.log('[MapView DEBUG] Map instance CREATED and mapInstanceReady set to true.');
+            }
 
-                // Удаляем старые метки и маршрут с карты
+            // Proceed with map operations only if map instance is ready
+            if (ymapRef.current && mapInstanceReady) { // Check mapInstanceReady here
+                console.log('[MapView DEBUG] Map instance IS ready. Proceeding with map operations.');
+                const mapInstance = ymapRef.current;
+
                 mapInstance.geoObjects.removeAll();
-                // Сбрасываем ссылку на старый маршрут, т.к. он удален с карты
                 if (routeRef.current) {
                     console.log('[MapView DEBUG] Removing existing route from map and ref.');
-                    routeRef.current = null; 
+                    routeRef.current = null;
                 }
 
-                const userLocation = [55.792139, 49.122135]; // Координаты пользователя
-
-                // Добавляем метку пользователя
+                const userLocation = [55.792139, 49.122135];
                 const userPlacemark = new ymaps.Placemark(
                     userLocation,
-                    {
-                        hintContent: 'Вы здесь',
-                        balloonContent: 'Ваше текущее местоположение'
-                    },
-                    {
-                        preset: 'islands#geolocationIcon',
-                        iconColor: '#007bff'
-                    }
+                    { hintContent: 'Вы здесь', balloonContent: 'Ваше текущее местоположение' },
+                    { preset: 'islands#geolocationIcon', iconColor: '#007bff' }
                 );
                 mapInstance.geoObjects.add(userPlacemark);
                 console.log('[MapView DEBUG] User placemark added.');
 
-                // Добавляем новые метки транспорта
                 console.log('[MapView DEBUG] Adding vehicle placemarks. Count:', filteredVehicles.length);
                 filteredVehicles.forEach((vehicle) => {
-                    // Determine placemark preset based on whether it's the activeVehicle
-                    let placemarkPreset = 'islands#blueCircleDotIcon'; // Default preset
+                    let placemarkPreset = 'islands#blueCircleDotIcon';
                     if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
-                        placemarkPreset = 'islands#redCircleDotIcon'; // Active preset
+                        placemarkPreset = 'islands#redCircleDotIcon';
                     }
-
                     const placemark = new ymaps.Placemark(
                         [parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)],
-                        {
-                            hintContent: vehicle.type,
-                            balloonContent: `Тип: ${vehicle.type}<br>Батарея: ${vehicle.batteryLevel}%<br>Цена: ${vehicle.pricePerMinute}₽/мин`,
-                        },
-                        {
-                            preset: placemarkPreset,
-                        }
+                        { hintContent: vehicle.type, balloonContent: `Тип: ${vehicle.type}<br>Батарея: ${vehicle.batteryLevel}%<br>Цена: ${vehicle.pricePerMinute}₽/мин` },
+                        { preset: placemarkPreset }
                     );
-
                     placemark.events.add('click', () => {
                         console.log('[MapView DEBUG] Placemark clicked:', vehicle);
                         if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
-                            // Second click on the same active placemark: show details
                             console.log('[MapView DEBUG] Second click on active vehicle. Setting selectedVehicle.');
                             setSelectedVehicle(vehicle);
                         } else {
-                            // First click, or click on a different placemark: set as active, hide details
                             console.log('[MapView DEBUG] First click or different vehicle. Setting activeVehicle, clearing selectedVehicle.');
                             setActiveVehicle(vehicle);
                             setSelectedVehicle(null);
@@ -190,22 +191,16 @@ const MapView = () => {
                     mapInstance.geoObjects.add(placemark);
                 });
 
-                // Логика построения маршрута
                 let routeDestination = null;
                 let buildRoute = false;
                 console.log('[MapView DEBUG] Initial routeDecision values. buildRoute:', buildRoute, 'routeDestination:', routeDestination, 'activeVehicle:', activeVehicle, 'selectedVehicleType:', selectedVehicleType);
 
-                // Priority 1: Route to active (clicked) vehicle
                 if (activeVehicle) {
                     console.log('[MapView DEBUG] Attempting route to activeVehicle:', activeVehicle);
-                    const isActiveVehicleInFilteredList = filteredVehicles.some(
-                        v => v.latitude === activeVehicle.latitude && v.longitude === activeVehicle.longitude
-                    );
+                    const isActiveVehicleInFilteredList = filteredVehicles.some(v => v.latitude === activeVehicle.latitude && v.longitude === activeVehicle.longitude);
                     console.log('[MapView DEBUG] isActiveVehicleInFilteredList:', isActiveVehicleInFilteredList);
-
                     if (isActiveVehicleInFilteredList) {
-                        // If a filter is active, the clicked vehicle must match the filter type
-                        if (selectedVehicleType) { 
+                        if (selectedVehicleType) {
                             const activeVehicleTypeEnglish = mapVehicleTypeToEnglish(activeVehicle.type);
                             console.log('[MapView DEBUG] Active vehicle type (English):', activeVehicleTypeEnglish, 'Selected filter type:', selectedVehicleType);
                             if (activeVehicleTypeEnglish && activeVehicleTypeEnglish.toLowerCase() === selectedVehicleType.toLowerCase()) {
@@ -215,23 +210,21 @@ const MapView = () => {
                             } else {
                                 console.log('[MapView DEBUG] Active vehicle does NOT match filter. No route to active.');
                             }
-                        } else { // No filter active, route to any clicked vehicle
+                        } else {
                             routeDestination = [parseFloat(activeVehicle.latitude), parseFloat(activeVehicle.longitude)];
                             buildRoute = true;
                             console.log('[MapView DEBUG] Route to active (no filter). buildRoute:', buildRoute, 'Destination:', routeDestination);
                         }
                     } else {
-                         console.log('[MapView DEBUG] Active vehicle is not in the current filtered list. No route to active.');
+                        console.log('[MapView DEBUG] Active vehicle is not in the current filtered list. No route to active.');
                     }
                 }
 
-                // Priority 2: If no active vehicle route, route to nearest of selected type
                 if (!buildRoute && selectedVehicleType && filteredVehicles.length > 0) {
                     console.log('[MapView DEBUG] Attempting route to nearest of type:', selectedVehicleType, 'Count:', filteredVehicles.length);
                     let nearestVehicle = null;
                     let minDistanceSq = Infinity;
-
-                    filteredVehicles.forEach(v => { // Changed from 'vehicle' to 'v' to avoid conflict in logs if any
+                    filteredVehicles.forEach(v => {
                         const vehicleLat = parseFloat(v.latitude);
                         const vehicleLon = parseFloat(v.longitude);
                         const distSq = Math.pow(vehicleLat - userLocation[0], 2) + Math.pow(vehicleLon - userLocation[1], 2);
@@ -240,7 +233,6 @@ const MapView = () => {
                             nearestVehicle = v;
                         }
                     });
-
                     if (nearestVehicle) {
                         routeDestination = [parseFloat(nearestVehicle.latitude), parseFloat(nearestVehicle.longitude)];
                         buildRoute = true;
@@ -252,35 +244,27 @@ const MapView = () => {
 
                 if (buildRoute && routeDestination) {
                     console.log('[MapView DEBUG] FINAL: Building route from', userLocation, 'to', routeDestination);
-                    const multiRoute = new ymaps.multiRouter.MultiRoute({
-                        referencePoints: [userLocation, routeDestination],
-                        params: {
-                            routingMode: 'pedestrian'
-                        }
-                    }, {
-                        boundsAutoApply: true,
-                        // Скрываем стандартные конки начальной и конечной точек маршрута
-                        wayPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>'),
-                        viaPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>') // Для промежут��чных точек, если будут
-                    });
-
+                    const multiRoute = new ymaps.multiRouter.MultiRoute(
+                        { referencePoints: [userLocation, routeDestination], params: { routingMode: 'pedestrian' } },
+                        { boundsAutoApply: true, wayPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>'), viaPointIconLayout: ymaps.templateLayoutFactory.createClass('<div></div>') }
+                    );
                     mapInstance.geoObjects.add(multiRoute);
                     routeRef.current = multiRoute;
                     console.log('[MapView DEBUG] Route added to map.');
                 } else {
                     console.log('[MapView DEBUG] FINAL: No route built. buildRoute:', buildRoute, 'routeDestination:', routeDestination);
                 }
-            });
+            } else {
+                console.log('[MapView DEBUG] Map instance NOT YET ready (mapInstanceReady is false or ymapRef.current is null), skipping map operations.');
+            }
         } else {
-            console.log('[MapView DEBUG] YMAPS API or mapRef.current not available.');
+            console.log('[MapView DEBUG] YMAPS API not ready OR mapRef.current not available. mapApiReady:', mapApiReady);
         }
-        // Очистка при размонтировании компонента
+
         return () => {
             console.log('[MapView DEBUG] MAIN MAP EFFECT cleanup.');
-            // Логика очистки, если необходима при полном удалении компонента MapView
-            // Например, if (ymapRef.current && ymapRef.current.destroy) ymapRef.current.destroy();
         };
-    }, [vehicles, selectedVehicleType, activeVehicle, ymapRef, mapRef, filteredVehicles]); // Добавляем filteredVehicles в зависимости
+    }, [mapApiReady, mapInstanceReady, vehicles, selectedVehicleType, activeVehicle, filteredVehicles, mapRef]); // Added mapApiReady, mapInstanceReady, removed ymapRef
 
     const handleCloseDetails = () => setSelectedVehicle(null);
 
