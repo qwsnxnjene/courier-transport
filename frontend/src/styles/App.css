@@ -917,6 +917,11 @@ body, html {
   animation: pulse 1.5s infinite;
 }
 
+/* Стили для кнопки GO RIDE в режиме показа информации */
+.go-ride-button.info-active {
+  background-color: #28a745; /* Зеленый цвет для кнопки начала поездки */
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
@@ -952,7 +957,7 @@ body, html {
 
 .ride-info-slider-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
   border-bottom: 1px solid #e5e5e5;
@@ -963,6 +968,19 @@ body, html {
   font-size: 18px;
   font-weight: bold;
   color: #333;
+}
+
+.close-info-button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.close-info-button:hover {
+  color: #dc3545;
 }
 
 .ride-info-slider-content {

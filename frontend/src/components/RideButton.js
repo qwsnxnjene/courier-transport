@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useVehicle } from '../context/VehicleContext';
-import { FaClock, FaMoneyBillWave, FaMapMarkerAlt, FaTimes } from 'react-icons/fa';
+import { FaClock, FaMoneyBillWave, FaMapMarkerAlt, FaTimes, FaBatteryThreeQuarters } from 'react-icons/fa';
 
 const RideButton = () => {
     const [isRiding, setIsRiding] = useState(false);
@@ -9,6 +9,7 @@ const RideButton = () => {
     const [cost, setCost] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
+    const [showVehicleInfo, setShowVehicleInfo] = useState(false);
     const { selectedVehicleType, activeVehicle } = useVehicle();
 
     // Таймер для обновления времени и стоимости поездки
@@ -19,7 +20,7 @@ const RideButton = () => {
                 const currentElapsed = Math.floor((Date.now() - startTime) / 1000);
                 setElapsedTime(currentElapsed);
                 
-                // Рассчитаем стоимость. По умолчанию 5.4р/мин, для велосипеда 3р/мин
+                // Рассчитаем стоимость. По умолчанию 5.4р/мин, для велосипеда 3р/мин (велик тоже 5.4р/мин)
                 const rate = (activeVehicle && activeVehicle.pricePerMinute) || 
                              ((activeVehicle && (activeVehicle.type === 'Велосипед' || activeVehicle.type === 'Bike')) ? 3 : 5.4);
                 setCost(((rate / 60) * currentElapsed).toFixed(2));
@@ -41,6 +42,15 @@ const RideButton = () => {
         return () => clearTimeout(notificationTimer);
     }, [showNotification]);
 
+    // Покажем информацию о транспорте при изменении activeVehicle
+    useEffect(() => {
+        if (activeVehicle && !isRiding) {
+            setShowVehicleInfo(true);
+        } else if (!activeVehicle) {
+            setShowVehicleInfo(false);
+        }
+    }, [activeVehicle, isRiding]);
+
     const handleRideButton = () => {
         if (!activeVehicle && !isRiding) {
             // Если транспорт не выбран и поездка не начата, показываем предупреждение
@@ -49,11 +59,12 @@ const RideButton = () => {
         }
 
         if (!isRiding) {
-            // Начинаем поездку
+            // Начинаем поездку и скрываем информацию о транспорте
             setIsRiding(true);
             setStartTime(Date.now());
             setElapsedTime(0);
             setCost(0);
+            setShowVehicleInfo(false);
             console.log(`Начата поездка на транспорте типа: ${activeVehicle.type}`);
         } else {
             // Завершаем поездку
@@ -120,6 +131,16 @@ const RideButton = () => {
         return typeMap[type] || type;
     };
 
+    // Форматирование координат для отображения
+    const formatCoordinate = (coordinate) => {
+        if (typeof coordinate === 'string') {
+            return coordinate.slice(0, 8);
+        } else if (typeof coordinate === 'number') {
+            return coordinate.toFixed(6);
+        }
+        return '—';
+    };
+
     return (
         <>
             <div className="ride-action">
@@ -131,40 +152,87 @@ const RideButton = () => {
                 </button>
             </div>
             
-            {/* Слайдер с информацией о поездке */}
-            <div className={`ride-info-slider ${isRiding ? 'active' : ''}`}>
+            {/* Слайдер с информацией о поездке или о транспорте */}
+            <div className={`ride-info-slider ${isRiding || showVehicleInfo ? 'active' : ''}`}>
                 <div className="ride-info-slider-header">
                     <div className="vehicle-type">
                         {activeVehicle && (
                             <span>{getVehicleTypeName(activeVehicle.type)}</span>
                         )}
                     </div>
+                    {!isRiding && showVehicleInfo && (
+                        <button 
+                            className="close-info-button"
+                            onClick={() => setShowVehicleInfo(false)}
+                        >
+                            <FaTimes />
+                        </button>
+                    )}
                 </div>
                 
                 <div className="ride-info-slider-content">
-                    <div className="ride-info-item">
-                        <FaClock className="info-icon" />
-                        <div className="info-content">
-                            <div className="info-label">Время поездки</div>
-                            <div className="info-value">{formatTime(elapsedTime)}</div>
-                        </div>
-                    </div>
-                    
-                    <div className="ride-info-item">
-                        <FaMoneyBillWave className="info-icon" />
-                        <div className="info-content">
-                            <div className="info-label">Текущая стоимость</div>
-                            <div className="info-value">{cost} ₽</div>
-                        </div>
-                    </div>
-                    
-                    <div className="ride-info-item">
-                        <FaMapMarkerAlt className="info-icon" />
-                        <div className="info-content">
-                            <div className="info-label">Расстояние</div>
-                            <div className="info-value">{calculateDistance(elapsedTime)}</div>
-                        </div>
-                    </div>
+                    {isRiding ? (
+                        // Содержимое для активной поездки
+                        <>
+                            <div className="ride-info-item">
+                                <FaClock className="info-icon" />
+                                <div className="info-content">
+                                    <div className="info-label">Время поездки</div>
+                                    <div className="info-value">{formatTime(elapsedTime)}</div>
+                                </div>
+                            </div>
+                            
+                            <div className="ride-info-item">
+                                <FaMoneyBillWave className="info-icon" />
+                                <div className="info-content">
+                                    <div className="info-label">Текущая стоимость</div>
+                                    <div className="info-value">{cost} ₽</div>
+                                </div>
+                            </div>
+                            
+                            <div className="ride-info-item">
+                                <FaMapMarkerAlt className="info-icon" />
+                                <div className="info-content">
+                                    <div className="info-label">Расстояние</div>
+                                    <div className="info-value">{calculateDistance(elapsedTime)}</div>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        // Содержимое для информации о транспорте
+                        activeVehicle && showVehicleInfo && (
+                            <>
+                                <div className="ride-info-item">
+                                    <FaBatteryThreeQuarters className="info-icon" />
+                                    <div className="info-content">
+                                        <div className="info-label">Заряд</div>
+                                        <div className="info-value">{activeVehicle.batteryLevel}%</div>
+                                    </div>
+                                </div>
+                                
+                                <div className="ride-info-item">
+                                    <FaMoneyBillWave className="info-icon" />
+                                    <div className="info-content">
+                                        <div className="info-label">Стоимость</div>
+                                        <div className="info-value">
+                                            {(activeVehicle.pricePerMinute !== undefined ? activeVehicle.pricePerMinute : 
+                                            (activeVehicle.type === 'Велосипед' || activeVehicle.type === 'Bike') ? 3 : 5.4)} ₽/мин
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="ride-info-item">
+                                    <FaMapMarkerAlt className="info-icon" />
+                                    <div className="info-content">
+                                        <div className="info-label">Координаты</div>
+                                        <div className="info-value">
+                                            {formatCoordinate(activeVehicle.latitude)}, {formatCoordinate(activeVehicle.longitude)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )
+                    )}
                 </div>
             </div>
             

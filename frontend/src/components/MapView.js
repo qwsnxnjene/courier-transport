@@ -170,22 +170,54 @@ const MapView = () => {
                     if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
                         placemarkPreset = 'islands#redCircleDotIcon';
                     }
+                    
+                    // Создаем HTML-содержимое для балуна метки с кнопкой "Подробнее"
+                    const balloonContentLayout = ymaps.templateLayoutFactory.createClass(
+                        `<div class="balloon-content">
+                            <p><strong>Тип:</strong> ${vehicle.type}</p>
+                            <p><strong>Заряд:</strong> ${vehicle.batteryLevel}%</p>
+                            <p><strong>Цена:</strong> ${vehicle.pricePerMinute}₽/мин</p>
+                            <button id="details-btn" class="details-button" 
+                                style="background-color: #007bff; color: #fff; border: none; padding: 5px 10px; 
+                                border-radius: 5px; cursor: pointer; margin-top: 10px;">Подробнее</button>
+                        </div>`,
+                        {
+                            build: function() {
+                                balloonContentLayout.superclass.build.call(this);
+                                // Находим кнопку и добавляем обработчик
+                                document.getElementById('details-btn').addEventListener('click', () => {
+                                    handleShowDetails(vehicle);
+                                });
+                            },
+                            clear: function() {
+                                // Удаляем обработчик перед удалением макета из DOM
+                                if (document.getElementById('details-btn')) {
+                                    document.getElementById('details-btn').removeEventListener('click', () => {
+                                        handleShowDetails(vehicle);
+                                    });
+                                }
+                                balloonContentLayout.superclass.clear.call(this);
+                            }
+                        }
+                    );
+
                     const placemark = new ymaps.Placemark(
                         [parseFloat(vehicle.latitude), parseFloat(vehicle.longitude)],
-                        { hintContent: vehicle.type, balloonContent: `Тип: ${vehicle.type}<br>Батарея: ${vehicle.batteryLevel}%<br>Цена: ${vehicle.pricePerMinute}₽/мин` },
-                        { preset: placemarkPreset }
+                        { 
+                            hintContent: vehicle.type
+                        },
+                        { 
+                            preset: placemarkPreset,
+                            balloonContentLayout: balloonContentLayout,
+                            balloonPanelMaxMapArea: 0 // Это заставит балун всегда открываться в панели
+                        }
                     );
+                    
                     placemark.events.add('click', () => {
                         console.log('[MapView DEBUG] Placemark clicked:', vehicle);
-                        if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
-                            console.log('[MapView DEBUG] Second click on active vehicle. Setting selectedVehicle.');
-                            setSelectedVehicle(vehicle);
-                        } else {
-                            console.log('[MapView DEBUG] First click or different vehicle. Setting activeVehicle, clearing selectedVehicle.');
-                            setActiveVehicle(vehicle);
-                            setSelectedVehicle(null);
-                        }
+                        handlePlacemarkClick(vehicle);
                     });
+                    
                     mapInstance.geoObjects.add(placemark);
                 });
 
@@ -265,6 +297,28 @@ const MapView = () => {
             console.log('[MapView DEBUG] MAIN MAP EFFECT cleanup.');
         };
     }, [mapApiReady, mapInstanceReady, vehicles, selectedVehicleType, activeVehicle, filteredVehicles, mapRef]); // Added mapApiReady, mapInstanceReady, removed ymapRef
+
+    // Функция для обработки клика на метку - только активирует транспорт
+    const handlePlacemarkClick = (vehicle) => {
+        // Если кликнули на текущий активный транспорт
+        if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
+            // При втором клике на активную метку - снимаем выделение
+            console.log('[MapView DEBUG] Second click on active vehicle. Deactivating vehicle.');
+            setActiveVehicle(null);
+            setSelectedVehicle(null);
+        } else {
+            // Первый клик на новый транспорт - активируем его
+            console.log('[MapView DEBUG] First click or different vehicle. Setting activeVehicle.');
+            setActiveVehicle(vehicle);
+            setSelectedVehicle(null); // Закрываем модальное окно, если оно открыто
+        }
+    };
+
+    // Функция для отображения модального окна с деталями транспорта
+    const handleShowDetails = (vehicle) => {
+        console.log('[MapView DEBUG] Showing details for vehicle:', vehicle);
+        setSelectedVehicle(vehicle);
+    };
 
     const handleCloseDetails = () => setSelectedVehicle(null);
 
