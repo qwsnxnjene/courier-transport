@@ -9,11 +9,14 @@ export const useVehicle = () => useContext(VehicleContext);
 // Провайдер контекста
 export const VehicleProvider = ({ children }) => {
   const [selectedVehicleType, setSelectedVehicleType] = useState(null);
+  const [activeVehicle, setActiveVehicle] = useState(null);
 
   // Значение, которое будет доступно в контексте
   const value = {
     selectedVehicleType,
-    setSelectedVehicleType
+    setSelectedVehicleType,
+    activeVehicle,
+    setActiveVehicle
   };
 
   return (

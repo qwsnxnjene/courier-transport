@@ -910,3 +910,154 @@ body, html {
   background-color: #007bff;
   color: white;
 }
+
+/* Стили для кнопки GO RIDE в режиме активной поездки */
+.go-ride-button.riding {
+  background-color: #dc3545; /* Красный цвет для кнопки окончания поездки */
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+/* Стили для слайдера с информацией о поездке */
+.ride-info-slider {
+  position: fixed;
+  bottom: -200px; /* Начальная позиция за пределами экрана */
+  left: 0;
+  right: 0;
+  background-color: white;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  padding: 15px 20px;
+  transition: bottom 0.5s cubic-bezier(0.17, 0.67, 0.24, 0.99);
+  z-index: 900;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.ride-info-slider.active {
+  bottom: 60px; /* Выезжает над кнопкой GO RIDE */
+}
+
+.ride-info-slider-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 15px;
+}
+
+.vehicle-type {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.ride-info-slider-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ride-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-icon {
+  font-size: 18px;
+  color: #007bff;
+  min-width: 24px;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Адаптивные стили для слайдера */
+@media (max-width: 480px) {
+  .ride-info-slider.active {
+    bottom: 70px;
+  }
+  
+  .ride-info-slider-content {
+    gap: 12px;
+  }
+  
+  .info-icon {
+    font-size: 16px;
+  }
+  
+  .info-label {
+    font-size: 12px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+  }
+  
+  .ride-info-slider {
+    padding: 12px 15px;
+  }
+}
+
+/* Стили для уведомления о завершении поездки */
+.ride-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(40, 167, 69, 0.9);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}

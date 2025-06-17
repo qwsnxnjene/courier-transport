@@ -6,8 +6,7 @@ import { useVehicle } from '../context/VehicleContext';
 const MapView = () => {
     const [vehicles, setVehicles] = useState([]);
     const [selectedVehicle, setSelectedVehicle] = useState(null); // For ScooterDetails modal
-    const [activeVehicle, setActiveVehicle] = useState(null); // For active (red) placemark on map
-    const { selectedVehicleType } = useVehicle();
+    const { selectedVehicleType, activeVehicle, setActiveVehicle } = useVehicle();
     const mapRef = useRef(null); // Ссылка на DOM-элемент карты
     const ymapRef = useRef(null); // Ссылка на инстанс карты ymaps
     const routeRef = useRef(null); // Ссылка на текущий маршрут
