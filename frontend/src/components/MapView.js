@@ -1,80 +1,23 @@
 // MapView.js
 import React, { useEffect, useState, useRef } from 'react';
-import ScooterDetails from './ScooterDetails';
+// import ScooterDetails from './ScooterDetails'; // Removed, slider handles details
 import { useVehicle } from '../context/VehicleContext';
 
-const MapView = () => {
-    const [vehicles, setVehicles] = useState([]);
-    const [selectedVehicle, setSelectedVehicle] = useState(null); // For ScooterDetails modal
+// Note: The `vehicles` prop is now passed from App.js
+// The `setSliderVehicle` prop is also passed from App.js to directly set the vehicle for the slider
+const MapView = ({ vehicles, setSliderVehicle }) => {
+    // const [vehicles, setVehicles] = useState([]); // Vehicles state is now managed by App.js
+    // const [selectedVehicle, setSelectedVehicle] = useState(null); // Replaced by slider logic
     const [activeVehicle, setActiveVehicle] = useState(null); // For active (red) placemark on map
     const { selectedVehicleType } = useVehicle();
-    const mapRef = useRef(null); // Ссылка на DOM-элемент карты
-    const ymapRef = useRef(null); // Ссылка на инстанс карты ymaps
-    const routeRef = useRef(null); // Ссылка на текущий маршрут
+    const mapRef = useRef(null);
+    const ymapRef = useRef(null);
+    const routeRef = useRef(null);
 
     const [mapApiReady, setMapApiReady] = useState(false);
     const [mapInstanceReady, setMapInstanceReady] = useState(false);
 
-    useEffect(() => {
-        const fetchVehicles = async () => {
-            try {
-                const response = await fetch('http://localhost:3031/api/transport');
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data)
-
-                    if (data.length === 0) {
-                        console.warn('База данных пуста, используются тестовые данные.');
-                        setVehicles([
-                            {
-                                latitude: '55.796127',
-                                longitude: '49.106414',
-                                batteryLevel: 80,
-                                status: 'free',
-                                type: 'Электросамокат',
-                                pricePerMinute: 5
-                            },
-                            {
-                                latitude: '55.790000',
-                                longitude: '49.120000',
-                                batteryLevel: 40,
-                                status: 'free',
-                                type: 'Велосипед',
-                                pricePerMinute: 3
-                            },
-                            {
-                                latitude: '55.805000',
-                                longitude: '49.115000',
-                                batteryLevel: 95,
-                                status: 'free',
-                                type: 'Электровелосипед',
-                                pricePerMinute: 4
-                            },
-                        ]);
-                    } else {
-                        setVehicles(data);
-                    }
-                } else {
-                    console.error('Ошибка загрузки данных.');
-                     // Устанавливаем моковые данные в случае ошибки загрузки
-                    setVehicles([
-                        { latitude: '55.796127', longitude: '49.106414', batteryLevel: 80, status: 'free', type: 'Электросамокат', pricePerMinute: 5 },
-                        { latitude: '55.790000', longitude: '49.120000', batteryLevel: 40, status: 'free', type: 'Велосипед', pricePerMinute: 3 },
-                        { latitude: '55.805000', longitude: '49.115000', batteryLevel: 95, status: 'free', type: 'Электровелосипед', pricePerMinute: 4 },
-                    ]);
-                }
-            } catch (error) {
-                console.error('Ошибка сети:', error);
-                 // Устанавливаем моковые данные в случае ошибки сети
-                setVehicles([
-                    { latitude: '55.796127', longitude: '49.106414', batteryLevel: 80, status: 'free', type: 'Электросамокат', pricePerMinute: 5 },
-                    { latitude: '55.790000', longitude: '49.120000', batteryLevel: 40, status: 'free', type: 'Велосипед', pricePerMinute: 3 },
-                    { latitude: '55.805000', longitude: '49.115000', batteryLevel: 95, status: 'free', type: 'Электровелосипед', pricePerMinute: 4 },
-                ]);
-            }
-        };
-        fetchVehicles();
-    }, []);
+    // useEffect for fetching vehicles is removed, as vehicles are passed as a prop from App.js
 
     // Функция для преобразования русских названий типов в английские
     const mapVehicleTypeToEnglish = (russianType) => {
@@ -99,14 +42,13 @@ const MapView = () => {
 
     const filteredVehicles = selectedVehicleType 
         ? vehicles.filter(vehicle => vehicle && typeof vehicle.type === 'string' && matchesSelectedType(vehicle.type))
-        : vehicles;
+        : vehicles; // Use vehicles prop
     console.log('[MapView DEBUG] Initial/Re-render. selectedVehicleType:', selectedVehicleType, 'filteredVehicles count:', filteredVehicles.length);
 
     useEffect(() => {
         console.log('[MapView DEBUG] selectedVehicleType EFFECT triggered. New type:', selectedVehicleType);
-        // Reset active and selected vehicle when the type filter changes
         setActiveVehicle(null);
-        setSelectedVehicle(null);
+        // setSelectedVehicle(null); // Slider handles this
     }, [selectedVehicleType]);
 
     useEffect(() => {
@@ -179,14 +121,9 @@ const MapView = () => {
                     );
                     placemark.events.add('click', () => {
                         console.log('[MapView DEBUG] Placemark clicked:', vehicle);
-                        if (activeVehicle && activeVehicle.latitude === vehicle.latitude && activeVehicle.longitude === vehicle.longitude) {
-                            console.log('[MapView DEBUG] Second click on active vehicle. Setting selectedVehicle.');
-                            setSelectedVehicle(vehicle);
-                        } else {
-                            console.log('[MapView DEBUG] First click or different vehicle. Setting activeVehicle, clearing selectedVehicle.');
-                            setActiveVehicle(vehicle);
-                            setSelectedVehicle(null);
-                        }
+                        setActiveVehicle(vehicle); // Highlight placemark
+                        setSliderVehicle(vehicle); // Call prop function to show vehicle in slider (App.js handles this)
+                        // setSelectedVehicle(null); // No longer needed
                     });
                     mapInstance.geoObjects.add(placemark);
                 });
@@ -264,25 +201,16 @@ const MapView = () => {
         return () => {
             console.log('[MapView DEBUG] MAIN MAP EFFECT cleanup.');
         };
-    }, [mapApiReady, mapInstanceReady, vehicles, selectedVehicleType, activeVehicle, filteredVehicles, mapRef]); // Added mapApiReady, mapInstanceReady, removed ymapRef
+    }, [mapApiReady, mapInstanceReady, vehicles, selectedVehicleType, activeVehicle, filteredVehicles, mapRef, setSliderVehicle]); // Added setSliderVehicle to dependencies
 
-    const handleCloseDetails = () => setSelectedVehicle(null);
-
-    const handleBookVehicle = () => {
-        console.log(`Транспорт типа ${selectedVehicle.type} забронирован!`);
-        setSelectedVehicle(null);
-    };
+    // handleCloseDetails and handleBookVehicle are removed as ScooterDetails modal is removed
 
     return (
         <div className="map-container" style={{ width: '100%', height: '500px', position: 'relative' }}>
-            <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div> {/* DOM-элемент для карты */}
-            <ScooterDetails
-                vehicle={selectedVehicle}
-                onClose={handleCloseDetails}
-                onBook={handleBookVehicle}
-            />
+            <div ref={mapRef} style={{ width: '100%', height: '100%' }}></div>
+            {/* ScooterDetails component removed, slider will display details */}
         </div>
     );
-    }
+}
 export default MapView;
 

@@ -39,6 +39,7 @@ body, html {
   display: flex;
   gap: 8px;
   padding: 8px;
+  margin-bottom: 0; /* Or adjust if slider is not fixed but part of flow */
 }
 
 .vehicle-card {
@@ -77,8 +78,9 @@ body, html {
 .ride-action {
   display: flex;
   justify-content: center;
-  padding: 10px;
-  background: #fff;
+  padding: 12px 0; /* Adjusted padding for better spacing */
+  background: #fff; /* Ensure background for visual separation */
+  z-index: 999; /* Lower than slider */
 }
 
 .go-ride-button {
@@ -910,3 +912,130 @@ body, html {
   background-color: #007bff;
   color: white;
 }
+
+/* VehicleDetailSlider Styles */
+.vehicle-detail-slider {
+  position: fixed;
+  bottom: 70px; /* Positioned above the RideButton area */
+  left: 0;
+  right: 0;
+  height: 132px; /* Same height as VehicleSelector with its cards and aspect-ratio */
+  background-color: #fff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px 12px 10px 42px; /* TRBL - Reduced left padding to make icon fit better */
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  overflow: hidden;
+  transform: translateY(100%); /* Initially hidden below its final position */
+  transition: transform 0.3s ease-in-out;
+  z-index: 950;
+}
+
+.vehicle-detail-slider.open {
+  transform: translateY(0); /* Slides into view */
+}
+
+.back-slider-button {
+  position: absolute;
+  top: 10px;
+  left: 10px; /* Moved slightly left for better spacing */
+  background: none;
+  border: none;
+  font-size: 18px; /* Slightly smaller */
+  cursor: pointer;
+  color: #555;
+  padding: 5px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-content {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  gap: 10px; /* Slightly smaller gap */
+  overflow: hidden;
+  height: 100%; /* Ensure content fills the available height */
+}
+
+.vehicle-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 75px;
+  height: 75px;
+  background-color: #f0f4f8;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.slider-vehicle-icon {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.vehicle-icon-container:hover .slider-vehicle-icon {
+  transform: scale(1.05);
+}
+
+.slider-vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* Reduced gap for tighter text */
+  flex-grow: 1;
+  text-align: left;
+  overflow: hidden;
+}
+
+.slider-vehicle-info h4 {
+  margin: 0 0 3px 0; /* Adjusted margin */
+  font-size: 0.95rem; /* Slightly smaller font */
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slider-vehicle-info p {
+  margin: 0;
+  font-size: 0.8rem; /* Slightly smaller font */
+  color: #666; /* Slightly lighter color for less emphasis */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slider-vehicle-info p:last-child { /* Address line */
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-height: 36px; /* Adjusted max-height for 2 lines approx */
+    /* overflow-y: auto; /* Consider removing if overflow:hidden on parent is enough */
+}
+
+
+/* RideButton's container might need margin adjustment */
+.ride-action {
+  padding: 12px 0; /* Adjusted padding for better spacing */
+  background: #fff; /* Ensure background for visual separation */
+  /* z-index: 999; */
+}
+
+/* VehicleSelector might need margin adjustment */
+.vehicle-selector {
+  /* margin-bottom: 0; /* Removed, was for fixed slider */
+  /* Styles for VehicleSelector remain largely the same, it's just conditionally rendered */
+  /* Ensure it has appropriate padding if it's directly after RideButton */
+  padding-top: 8px; /* Add padding if needed */
+  padding-bottom: 8px;
+}
+
