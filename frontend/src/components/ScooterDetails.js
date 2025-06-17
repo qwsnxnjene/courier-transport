@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const typeTranslations = {
-    "E-Scooter": "Электросамокат",
     "Bike": "Велосипед",
-    "E-Bike": "Электровелосипед"
+    "E-Bike": "Электровелосипед",
+    "E-Scooter": "Электросамокат"
 };
 
 const ScooterDetails = ({ vehicle, onClose, onBook }) => {
@@ -11,10 +11,14 @@ const ScooterDetails = ({ vehicle, onClose, onBook }) => {
         return null;
     }
 
-    // Прямой доступ к данным, который мог приводить к 'undefined' для цены
-    const price = vehicle.pricePerMinute; 
+    // Сначала извлекаем тип и другие базовые данные
     const type = vehicle.type || '';
-    const charge = vehicle.batteryLevel; // Упрощенный доступ к заряду
+    const charge = vehicle.batteryLevel || 0;
+    
+    // Затем вычисляем цену на основе уже полученного типа
+    const price = vehicle.pricePerMinute !== undefined && vehicle.pricePerMinute !== null 
+        ? vehicle.pricePerMinute 
+        : (type === 'Велосипед' || type === 'Bike') ? 3 : 5.4;
 
     return (
         <div className="profile-overlay"> 
@@ -26,8 +30,8 @@ const ScooterDetails = ({ vehicle, onClose, onBook }) => {
                 <div className="modal-content">
                     <p><strong>Тип:</strong> {typeTranslations[type] || type}</p>
                     <p><strong>Заряд:</strong> {charge}%</p>
-                    {/* Следующая строка могла отображать "undefined ₽/мин" */}
-                    <p><strong>Стоимость:</strong> {price} ��/мин</p> 
+                    {/* Исправлен символ рубля */}
+                    <p><strong>Стоимость:</strong> {price} ₽/мин</p> 
                     <button onClick={onBook} className="login-button" style={{ width: '100%', marginTop: '20px' }}>
                         Забронировать
                     </button>
