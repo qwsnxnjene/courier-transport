@@ -75,7 +75,7 @@ code {
 }
 
 .complaint-form button {
-    width: 100%; /* Заполняет ширину экрана */
+    width: 100%; 
 }
 
 .settings-overlay {

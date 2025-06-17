@@ -6,8 +6,7 @@ import { useVehicle } from '../context/VehicleContext';
 const MapView = () => {
     const [vehicles, setVehicles] = useState([]);
     const [selectedVehicle, setSelectedVehicle] = useState(null); // For ScooterDetails modal
-    const [activeVehicle, setActiveVehicle] = useState(null); // For active (red) placemark on map
-    const { selectedVehicleType } = useVehicle();
+    const { selectedVehicleType, activeVehicle, setActiveVehicle } = useVehicle();
     const mapRef = useRef(null); // Ссылка на DOM-элемент карты
     const ymapRef = useRef(null); // Ссылка на инстанс карты ymaps
     const routeRef = useRef(null); // Ссылка на текущий маршрут
@@ -104,8 +103,7 @@ const MapView = () => {
 
     useEffect(() => {
         console.log('[MapView DEBUG] selectedVehicleType EFFECT triggered. New type:', selectedVehicleType);
-        // Reset active and selected vehicle when the type filter changes
-        setActiveVehicle(null);
+        // Не сбрасываем активный транспорт при изменении типа, чтобы метка могла остаться красной
         setSelectedVehicle(null);
     }, [selectedVehicleType]);
 
@@ -236,6 +234,8 @@ const MapView = () => {
                     if (nearestVehicle) {
                         routeDestination = [parseFloat(nearestVehicle.latitude), parseFloat(nearestVehicle.longitude)];
                         buildRoute = true;
+                        // Устанавливаем ближайший транспорт как активный, чтобы его метка стала красной
+                        setActiveVehicle(nearestVehicle);
                         console.log('[MapView DEBUG] Route to nearest. buildRoute:', buildRoute, 'Destination:', routeDestination, 'Nearest:', nearestVehicle);
                     } else {
                         console.log('[MapView DEBUG] No nearest vehicle found for type:', selectedVehicleType);
