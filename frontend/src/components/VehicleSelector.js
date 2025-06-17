@@ -12,11 +12,14 @@ const vehicles = [
 ];
 
 const VehicleSelector = () => {
-    const { selectedVehicleType, setSelectedVehicleType } = useVehicle();
+    const { selectedVehicleType, setSelectedVehicleType, setActiveVehicle } = useVehicle();
     const handleVehicleSelect = (type) => {
         // Если уже выбран этот тип, сбрасываем выбор (показываем все)
         if (selectedVehicleType === type) {
             setSelectedVehicleType(null);
+            // Также сбрасываем активный транспорт, чтобы удалить маршрут
+            setActiveVehicle(null);
+            console.log('[VehicleSelector DEBUG] Deselected vehicle type and cleared active vehicle');
         } else {
             setSelectedVehicleType(type);
         }
